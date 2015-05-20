@@ -1,0 +1,22 @@
+{
+    "name": "mindplay/testies",
+    "description": "Yeah, testies: a lightweight library for quick, simple unit-testing",
+    "type": "library",
+    "license": "LGPL3.0+",
+    "authors": [
+        {
+            "name": "Rasmus Schultz",
+            "email": "rasc@fynskemedier.dk"
+        }
+    ],
+    "require-dev": {
+        "phpunit/php-code-coverage": "2.*@dev",
+        "guzzlehttp/guzzle": "5.*"
+    },
+    "autoload": {
+        "files": ["header.php"],
+        "psr-4": {
+            "mindplay\\testies\\": "src/"
+        }
+    }
+}
