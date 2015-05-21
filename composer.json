@@ -9,6 +9,9 @@
             "email": "rasc@fynskemedier.dk"
         }
     ],
+    "suggest": {
+        "phpunit/php-code-coverage": "2.*@dev"
+    },
     "require-dev": {
         "phpunit/php-code-coverage": "2.*@dev",
         "guzzlehttp/guzzle": "5.*"
