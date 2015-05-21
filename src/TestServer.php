@@ -43,8 +43,6 @@ class TestServer
 
         $cmd = "php -S {$host}:{$port} -t {$path}";
 
-        echo $cmd;
-
         $this->proc = proc_open($cmd, $descriptorspec, $this->pipes);
 
         // TODO proper error handling
