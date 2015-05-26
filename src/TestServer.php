@@ -53,16 +53,19 @@ class TestServer
      */
     public function __destruct()
     {
+        $status = proc_get_status($this->proc);
+
+        if ($status['running']) {
+            if (stripos(php_uname('s'), 'win') > -1) {
+                exec("taskkill /F /T /PID {$status['pid']}");
+            } else {
+                proc_terminate($this->proc);
+            }
+        }
+
         fclose($this->pipes[0]);
         fclose($this->pipes[1]);
-
-        if (stripos(php_uname('s'), 'win') > -1) {
-            $status = proc_get_status($this->proc);
-
-            exec("taskkill /F /T /PID {$status['pid']}");
-        } else {
-            proc_terminate($this->proc);
-        }
+        fclose($this->pipes[2]);
 
         proc_close($this->proc);
     }
