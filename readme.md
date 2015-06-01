@@ -69,7 +69,7 @@ test(
     'Various things of great importance',
     function () {
         ok($foo instanceof Foo);              # type-checking an object
-        eq(is_int(inspect($foo, '_count')));  # type-checking a private property
+        ok(is_int(inspect($foo, '_count')));  # type-checking a private property
         ok(123 == '123');                     # loose comparison
         ok(in_array('b', ['a','b','c']));     # check for presence of a value
         ok(isset($map['key']));               # check for presence of a key
