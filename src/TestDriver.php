@@ -224,8 +224,8 @@ class TestDriver
     {
         if ($value instanceof Exception) {
             return $detailed
-                ? get_class($value) . ": \"" . $value->getMessage() . "\"\n" . $value->getTraceAsString()
-                : get_class($value) . ": \"" . $value->getMessage() . "\"";
+                ? get_class($value) . ": \n\"" . $value->getMessage() . "\"\n\nStacktrace:\n" . $value->getTraceAsString()
+                : get_class($value) . ": \n\"" . $value->getMessage() . "\"";
         }
 
         if (!$detailed && is_array($value)) {
