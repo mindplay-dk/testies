@@ -42,13 +42,33 @@ function run()
  * To run all the queued tests (and get the result) call {@link @run()}
  *
  * @param string   $title    test title (short, concise description)
- * @param callable $function test implementation
+ * @param \Closure $function test implementation
  *
  * @return void
  */
-function test($title, $function)
+function test($title, \Closure $function)
 {
     configure()->driver->addTest($title, $function);
+}
+
+/**
+ * Set a setup function that is executed before each test.
+ *
+ * @param \Closure $function
+ */
+function setup(\Closure $function)
+{
+    configure()->driver->setSetup($function);
+}
+
+/**
+ * Set a teardown function that is executed after each test.
+ *
+ * @param \Closure $function
+ */
+function teardown(\Closure $function)
+{
+    configure()->driver->setTeardown($function);
 }
 
 /**

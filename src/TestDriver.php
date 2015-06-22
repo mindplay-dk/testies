@@ -65,18 +65,44 @@ class TestDriver
     protected $last_output;
 
     /**
-     * @param string   $title    test title (short, concise description)
-     * @param callable $function test implementation
+     * @var Closure
+     */
+    protected $setup;
+
+    /**
+     * @var Closure
+     */
+    protected $teardown;
+
+    /**
+     * @param string  $title    test title (short, concise description)
+     * @param Closure $function test implementation
      *
      * @return $this
      *
      * @see test()
      */
-    public function addTest($title, $function)
+    public function addTest($title, Closure $function)
     {
         $this->tests[$title] = $function;
 
         return $this;
+    }
+
+    /**
+     * @param Closure $function
+     */
+    public function setSetup(Closure $function)
+    {
+        $this->setup = $function;
+    }
+
+    /**
+     * @param Closure $function
+     */
+    public function setTeardown(Closure $function)
+    {
+        $this->teardown = $function;
     }
 
     /**
@@ -109,7 +135,15 @@ class TestDriver
             $this->current_test = $title;
 
             try {
+                if ($this->setup) {
+                    call_user_func($this->setup);
+                }
+
                 call_user_func($function);
+
+                if ($this->teardown) {
+                    call_user_func($this->teardown);
+                }
             } catch (Exception $e) {
                 $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
             }
