@@ -9,6 +9,7 @@ use PHP_CodeCoverage_Report_Clover;
 use Exception;
 use ErrorException;
 use Closure;
+use RuntimeException;
 
 /**
  * This class implements the default driver for testing.
@@ -33,6 +34,11 @@ class TestDriver
      * @var PHP_CodeCoverage|null active code coverage instance (or NULL if inactive)
      */
     public $coverage;
+
+    /**
+     * @var bool true to enable throwing of unexpected exceptions in tests (useful for debugging)
+     */
+    public $throw = false;
 
     /**
      * @var string absolute path to code coverage report output file (e.g. "clover.xml")
@@ -134,6 +140,8 @@ class TestDriver
         foreach ($this->tests as $title => $function) {
             $this->current_test = $title;
 
+            $thrown = null;
+
             try {
                 if ($this->setup) {
                     call_user_func($this->setup);
@@ -146,6 +154,12 @@ class TestDriver
                 }
             } catch (Exception $e) {
                 $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
+
+                $thrown = $e;
+            }
+
+            if ($thrown && $this->throw) {
+                throw new Exception("Exception while running test: {$title}", 0, $thrown);
             }
         }
 
