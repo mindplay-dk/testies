@@ -73,6 +73,20 @@ class TestConfiguration
     public function disableErrorHandler()
     {
         $this->driver->strict = false;
+
+        return $this;
+    }
+
+    /**
+     * Enable throwing of unexpected exceptions in tests (useful for debugging)
+     *
+     * @return $this
+     */
+    public function throwExceptions()
+    {
+        $this->driver->throw = true;
+
+        return $this;
     }
 
     /**
@@ -83,6 +97,8 @@ class TestConfiguration
     public function enableVerboseOutput()
     {
         $this->driver->verbose = true;
+
+        return $this;
     }
 
     /**

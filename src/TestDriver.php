@@ -9,6 +9,7 @@ use PHP_CodeCoverage_Report_Clover;
 use Exception;
 use ErrorException;
 use Closure;
+use RuntimeException;
 
 /**
  * This class implements the default driver for testing.
@@ -33,6 +34,11 @@ class TestDriver
      * @var PHP_CodeCoverage|null active code coverage instance (or NULL if inactive)
      */
     public $coverage;
+
+    /**
+     * @var bool true to enable throwing of unexpected exceptions in tests (useful for debugging)
+     */
+    public $throw = false;
 
     /**
      * @var string absolute path to code coverage report output file (e.g. "clover.xml")
@@ -65,18 +71,44 @@ class TestDriver
     protected $last_output;
 
     /**
-     * @param string   $title    test title (short, concise description)
-     * @param callable $function test implementation
+     * @var Closure
+     */
+    protected $setup;
+
+    /**
+     * @var Closure
+     */
+    protected $teardown;
+
+    /**
+     * @param string  $title    test title (short, concise description)
+     * @param Closure $function test implementation
      *
      * @return $this
      *
      * @see test()
      */
-    public function addTest($title, $function)
+    public function addTest($title, Closure $function)
     {
         $this->tests[$title] = $function;
 
         return $this;
+    }
+
+    /**
+     * @param Closure $function
+     */
+    public function setSetup(Closure $function)
+    {
+        $this->setup = $function;
+    }
+
+    /**
+     * @param Closure $function
+     */
+    public function setTeardown(Closure $function)
+    {
+        $this->teardown = $function;
     }
 
     /**
@@ -108,10 +140,26 @@ class TestDriver
         foreach ($this->tests as $title => $function) {
             $this->current_test = $title;
 
+            $thrown = null;
+
             try {
+                if ($this->setup) {
+                    call_user_func($this->setup);
+                }
+
                 call_user_func($function);
+
+                if ($this->teardown) {
+                    call_user_func($this->teardown);
+                }
             } catch (Exception $e) {
                 $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
+
+                $thrown = $e;
+            }
+
+            if ($thrown && $this->throw) {
+                throw new Exception("Exception while running test: {$title}", 0, $thrown);
             }
         }
 
@@ -224,8 +272,8 @@ class TestDriver
     {
         if ($value instanceof Exception) {
             return $detailed
-                ? get_class($value) . ": \"" . $value->getMessage() . "\"\n" . $value->getTraceAsString()
-                : get_class($value) . ": \"" . $value->getMessage() . "\"";
+                ? get_class($value) . ": \n\"" . $value->getMessage() . "\"\n\nStacktrace:\n" . $value->getTraceAsString()
+                : get_class($value) . ": \n\"" . $value->getMessage() . "\"";
         }
 
         if (!$detailed && is_array($value)) {
