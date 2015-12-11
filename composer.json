@@ -10,10 +10,10 @@
         }
     ],
     "suggest": {
-        "phpunit/php-code-coverage": "2.*@dev"
+        "phpunit/php-code-coverage": "^3.0"
     },
     "require-dev": {
-        "phpunit/php-code-coverage": "2.*@dev",
+        "phpunit/php-code-coverage": "^3.0",
         "guzzlehttp/guzzle": "5.*"
     },
     "autoload": {
