@@ -2,6 +2,7 @@
 
 namespace mindplay\testies;
 
+use Error;
 use PHP_CodeCoverage;
 use PHP_CodeCoverage_Report_Text;
 use PHP_CodeCoverage_Report_Clover;
@@ -156,6 +157,10 @@ class TestDriver
                 $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
 
                 $thrown = $e;
+            } catch (Error $e) {
+                $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
+
+                $thrown = $e;
             }
 
             if ($thrown && $this->throw) {
@@ -270,7 +275,7 @@ class TestDriver
      */
     public function format($value, $detailed = false)
     {
-        if ($value instanceof Exception) {
+        if ($value instanceof Exception || $value instanceof Error) {
             return $detailed
                 ? get_class($value) . ": \n\"" . $value->getMessage() . "\"\n\nStacktrace:\n" . $value->getTraceAsString()
                 : get_class($value) . ": \n\"" . $value->getMessage() . "\"";
