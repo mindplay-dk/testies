@@ -108,29 +108,37 @@ function eq($value, $expected, $why = null)
 /**
  * Check for an expected exception, which must be thrown.
  *
- * @param string   $exception_type Exception type name (use `ClassName::class` syntax where possible)
- * @param string   $why            description of assertion
- * @param callable $function       function expected to cause the exception
+ * @param string          $exception_type Exception type name (use `ClassName::class` syntax where possible)
+ * @param string          $why            reason for making this assertion
+ * @param callable        $function       function expected to cause the exception
+ * @param string|string[] $patterns       regular expression pattern(s) to test against the Exception message
  *
  * @void
  */
-function expect($exception_type, $why, $function)
+function expect($exception_type, $why, $function, $patterns = array())
 {
     try {
         call_user_func($function);
     } catch (Exception $e) {
         if ($e instanceof $exception_type) {
+            foreach ((array) $patterns as $pattern) {
+                if (preg_match($pattern, $e->getMessage()) !== 1) {
+                    ok(false, "$why (expected {$exception_type} message did not match pattern: {$pattern})", $e);
+                    return;
+                }
+            }
+
             ok(true, $why, $e);
         } else {
             $actual_type = get_class($e);
 
-            configure()->driver->printResult(false, "$why (expected {$exception_type} but {$actual_type} was thrown)");
+            ok(false, "$why (expected {$exception_type} but {$actual_type} was thrown)");
         }
 
         return;
     }
 
-    configure()->driver->printResult(false, "{$why} (expected exception {$exception_type} was NOT thrown)");
+    ok(false, "{$why} (expected exception {$exception_type} was NOT thrown)");
 }
 
 /**
