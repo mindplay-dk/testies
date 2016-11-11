@@ -9,15 +9,18 @@
             "email": "rasc@fynskemedier.dk"
         }
     ],
-    "suggest": {
-        "phpunit/php-code-coverage": "^3.0"
+    "require": {
+        "php": ">= 5.6"
     },
     "require-dev": {
-        "phpunit/php-code-coverage": "^3.0",
-        "guzzlehttp/guzzle": "5.*"
+        "phpunit/php-code-coverage": "^4",
+        "guzzlehttp/guzzle": "^5"
+    },
+    "suggest": {
+        "phpunit/php-code-coverage": "^4"
     },
     "autoload": {
-        "files": ["header.php"],
+        "files": ["src/test.func.php"],
         "psr-4": {
             "mindplay\\testies\\": "src/"
         }

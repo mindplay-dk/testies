@@ -2,15 +2,12 @@
 
 namespace mindplay\testies;
 
-use Error;
-use PHP_CodeCoverage;
-use PHP_CodeCoverage_Report_Text;
-use PHP_CodeCoverage_Report_Clover;
-
-use Exception;
-use ErrorException;
 use Closure;
-use RuntimeException;
+use Error;
+use ErrorException;
+use Exception;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Report;
 
 /**
  * This class implements the default driver for testing.
@@ -32,7 +29,7 @@ class TestDriver
     public $strict = true;
 
     /**
-     * @var PHP_CodeCoverage|null active code coverage instance (or NULL if inactive)
+     * @var CodeCoverage|null active code coverage instance (or NULL if inactive)
      */
     public $coverage;
 
@@ -49,7 +46,7 @@ class TestDriver
     /**
      * @var Closure[] map where test title => test function
      */
-    protected $tests = array();
+    protected $tests = [];
 
     /**
      * @var int total number of assertions performed
@@ -281,7 +278,7 @@ class TestDriver
                 : get_class($value) . ": \n\"" . $value->getMessage() . "\"";
         }
 
-        if (!$detailed && is_array($value)) {
+        if (! $detailed && is_array($value)) {
             return 'array[' . count($value) . ']';
         }
 
@@ -289,7 +286,7 @@ class TestDriver
             return $value ? 'TRUE' : 'FALSE';
         }
 
-        if (is_object($value) && !$detailed) {
+        if (is_object($value) && ! $detailed) {
             return get_class($value);
         }
 
@@ -336,13 +333,13 @@ class TestDriver
     /**
      * Print the results of code coverage analysis to the console
      *
-     * @param PHP_CodeCoverage $coverage
+     * @param CodeCoverage $coverage
      *
      * @return void
      */
-    public function printCodeCoverageResult(PHP_CodeCoverage $coverage)
+    public function printCodeCoverageResult(CodeCoverage $coverage)
     {
-        $report = new PHP_CodeCoverage_Report_Text(10, 90, false, false);
+        $report = new Report\Text(10, 90, false, false);
 
         echo $report->process($coverage, false);
     }
@@ -350,14 +347,14 @@ class TestDriver
     /**
      * Output the results of code coverage analysis to an XML file
      *
-     * @param PHP_CodeCoverage $coverage
-     * @param string           $coverage_output_path
+     * @param CodeCoverage $coverage
+     * @param string       $coverage_output_path
      *
      * @return void
      */
     public function outputCodeCoverageReport($coverage, $coverage_output_path)
     {
-        $report = new PHP_CodeCoverage_Report_Clover();
+        $report = new Report\Clover();
 
         $report->process($coverage, $coverage_output_path);
     }

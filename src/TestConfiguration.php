@@ -2,8 +2,8 @@
 
 namespace mindplay\testies;
 
-use PHP_CodeCoverage_Exception;
-use PHP_CodeCoverage;
+use RuntimeException;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
 
 /**
  * This class creates and configures the test-driver.
@@ -41,22 +41,22 @@ class TestConfiguration
      */
     public function enableCodeCoverage($output_path = null, $source_paths = null)
     {
-        if (class_exists('PHP_CodeCoverage')) {
+        if (class_exists(CodeCoverage::class)) {
             try {
-                $coverage = new PHP_CodeCoverage;
+                $coverage = new CodeCoverage();
 
                 if ($source_paths) {
                     $filter = $coverage->filter();
 
                     foreach ((array)$source_paths as $path) {
-                        $filter->addDirectoryToWhiteList($path);
+                        $filter->addDirectoryToWhitelist($path);
                     }
                 }
 
                 $this->driver->coverage = $coverage;
                 $this->driver->coverage_output_path = $output_path;
-            } catch (PHP_CodeCoverage_Exception $e) {
-                echo "# Notice: no code coverage run-time available\n";
+            } catch (RuntimeException $e) {
+                echo "# Notice: {$e->getMessage()}\n";
             }
         } else {
             echo "# Notice: php-code-coverage not installed\n";

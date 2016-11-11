@@ -6,7 +6,7 @@ use mindplay\testies\TestServer;
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 configure()->enableVerboseOutput();
-#configure()->enableCodeCoverage(__DIR__ . '/build/clover.xml', dirname(__DIR__) . '/src');
+configure()->enableCodeCoverage(__DIR__ . '/build/clover.xml', dirname(__DIR__) . '/src');
 
 $server = new TestServer(__DIR__, 8088);
 
