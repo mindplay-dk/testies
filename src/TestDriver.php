@@ -91,6 +91,10 @@ class TestDriver
      */
     public function addTest($title, Closure $function)
     {
+        if (isset($this->tests[$title])) {
+            throw new RuntimeException("duplicate test name: {$title}");
+        }
+
         $this->tests[$title] = $function;
 
         return $this;
