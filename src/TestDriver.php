@@ -44,7 +44,7 @@ class TestDriver
     public $coverage_output_path = null;
 
     /**
-     * @var Closure[] map where test title => test function
+     * @var Test[] list of Tests
      */
     protected $tests = [];
 
@@ -59,12 +59,12 @@ class TestDriver
     protected $failures = 0;
 
     /**
-     * @var string title the test currently being run
+     * @var Test the Test currently being run
      */
     protected $current_test;
 
     /**
-     * @var string title of the test that last generated output
+     * @var Test the Test that last generated output
      */
     protected $last_output;
 
@@ -88,7 +88,7 @@ class TestDriver
      */
     public function addTest($title, Closure $function)
     {
-        $this->tests[$title] = $function;
+        $this->tests[] = new Test($title, $function);
 
         return $this;
     }
@@ -135,8 +135,8 @@ class TestDriver
             $this->coverage->start('test');
         }
 
-        foreach ($this->tests as $title => $function) {
-            $this->current_test = $title;
+        foreach ($this->tests as $test) {
+            $this->current_test = $test;
 
             $thrown = null;
 
@@ -145,7 +145,7 @@ class TestDriver
                     call_user_func($this->setup);
                 }
 
-                call_user_func($function);
+                call_user_func($test->getFunction());
 
                 if ($this->teardown) {
                     call_user_func($this->teardown);
@@ -161,7 +161,7 @@ class TestDriver
             }
 
             if ($thrown && $this->throw) {
-                throw new Exception("Exception while running test: {$title}", 0, $thrown);
+                throw new Exception("Exception while running test: {$test->getTitle()}", 0, $thrown);
             }
         }
 
@@ -224,7 +224,7 @@ class TestDriver
         }
 
         if ($this->last_output !== $this->current_test) {
-            $this->printTitle($this->current_test);
+            $this->printTitle($this->current_test->getTitle());
 
             $this->last_output = $this->current_test;
         }
@@ -302,7 +302,7 @@ class TestDriver
     {
         $traces = debug_backtrace();
 
-        $current_function = $this->tests[$this->current_test];
+        $current_function = $this->current_test->getFunction();
 
         $skip = 0;
 
