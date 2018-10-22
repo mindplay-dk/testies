@@ -2,8 +2,8 @@
 
 namespace mindplay\testies;
 
-use PHP_CodeCoverage_Exception;
 use PHP_CodeCoverage;
+use PHP_CodeCoverage_Exception;
 
 /**
  * This class creates and configures the test-driver.
@@ -23,6 +23,10 @@ class TestConfiguration
     public function __construct(TestDriver $driver = null)
     {
         $this->driver = $driver ?: $this->createDefaultDriver();
+
+        if (\enabled("verbose", "v")) {
+            $this->enableVerboseOutput();
+        }
     }
 
     /**

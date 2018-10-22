@@ -21,6 +21,21 @@ function configure($config = null)
 }
 
 /**
+ * Tests if a given option is enabled on the command-line.
+ *
+ * For example, `if (enabled('skip-slow'))` checks for a `--skip-slow` option.
+ *
+ * @param string $option    option name
+ * @param string $shorthand single-letter shorthand (optional)
+ *
+ * @return bool TRUE, if the specified option was enabled on the command-line
+ */
+function enabled($option, $shorthand = "")
+{
+    return in_array(getopt($shorthand, [$option]), [[$option => false], [$shorthand => false]], true);
+}
+
+/**
  * Run all queued tests.
  *
  * Typical usage, after configuring your tests with calls to {@link test()}:
@@ -31,9 +46,9 @@ function configure($config = null)
  */
 function run()
 {
-    $status = configure()->driver->run();
+    $success = configure()->driver->run();
 
-    return $status ? 0 : 1;
+    return $success ? 0 : 1;
 }
 
 /**
