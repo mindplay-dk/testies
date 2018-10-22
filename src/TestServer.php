@@ -21,11 +21,11 @@ class TestServer
     /**
      * Launch the built-in PHP server as a child process.
      *
-     * @param string|null $path absolute path to a root folder
-     * @param int         $port local port number (defaults to 8000)
-     * @param string|null $host local host name or IP (defaults to "127.0.0.1")
+     * @param string $path absolute path to a root folder
+     * @param int    $port local port number (defaults to 8000)
+     * @param string $host local host name or IP (defaults to "127.0.0.1")
      */
-    public function __construct($path = null, $port = 8000, $host = null)
+    public function __construct(string $path = null, int $port = 8000, string $host = null)
     {
         if ($path === null) {
             $path = getcwd();

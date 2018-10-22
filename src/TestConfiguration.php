@@ -8,7 +8,7 @@ use SebastianBergmann\CodeCoverage\CodeCoverage;
 /**
  * This class creates and configures the test-driver.
  *
- * It's exposed via the {@link configure()} function.
+ * It's exposed via the {@see configure()} function.
  */
 class TestConfiguration
 {
@@ -24,7 +24,7 @@ class TestConfiguration
     {
         $this->driver = $driver ?: $this->createDefaultDriver();
 
-        if (\enabled("verbose", "v")) {
+        if (enabled("verbose", "v")) {
             $this->enableVerboseOutput();
         }
     }
@@ -36,25 +36,23 @@ class TestConfiguration
      *
      * @link https://packagist.org/packages/phpunit/php-code-coverage
      *
-     * @param string               $output_path  absolute path to code coverage (clover.xml) file
+     * @param string          $output_path       absolute path to code coverage (clover.xml) file
      *                                           example: __DIR__ . '/build/logs/clover.xml'
-     * @param string|string[]|null $source_paths one or more paths to source folders (of code being tested)
+     * @param string|string[] $source_paths      one or more paths to source folders (of code being tested)
      *                                           example: dirname(__DIR__) . '/src'
      *
      * @return $this
      */
-    public function enableCodeCoverage($output_path = null, $source_paths = null)
+    public function enableCodeCoverage(string $output_path = null, $source_paths = [])
     {
         if (class_exists(CodeCoverage::class)) {
             try {
                 $coverage = new CodeCoverage();
 
-                if ($source_paths) {
-                    $filter = $coverage->filter();
+                $filter = $coverage->filter();
 
-                    foreach ((array)$source_paths as $path) {
-                        $filter->addDirectoryToWhitelist($path);
-                    }
+                foreach ((array)$source_paths as $path) {
+                    $filter->addDirectoryToWhitelist($path);
                 }
 
                 $this->driver->coverage = $coverage;

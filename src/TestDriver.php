@@ -6,14 +6,14 @@ use Closure;
 use Error;
 use ErrorException;
 use Exception;
+use RuntimeException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Report;
-use RuntimeException;
 
 /**
  * This class implements the default driver for testing.
  *
- * You can override the default test driver with an extended driver via {@link configure()}.
+ * You can override the default test driver with an extended driver via {@see configure()}.
  *
  * To access the driver (e.g. from custom assertion functions) use `configure()->driver->...`
  */
@@ -119,7 +119,7 @@ class TestDriver
      *
      * @return bool true if all tests succeed; otherwise false
      */
-    public function run()
+    public function run(): bool
     {
         $this->assertions = 0;
         $this->failures = 0;
@@ -202,7 +202,7 @@ class TestDriver
      *
      * @return void
      */
-    public function printTitle($title)
+    public function printTitle(string $title)
     {
         echo "\n=== $title ===\n\n";
     }
@@ -210,13 +210,13 @@ class TestDriver
     /**
      * Check and report the result of an expression.
      *
-     * @param bool   $result result of assertion (must === TRUE)
-     * @param string $why    description of assertion
-     * @param mixed  $value  optional value (displays on failure)
+     * @param bool        $result result of assertion (must === TRUE)
+     * @param string|null $why    optional description of assertion
+     * @param mixed       $value  optional value (displays on failure)
      *
      * @return void
      */
-    public function printResult($result, $why = null, $value = null)
+    public function printResult(bool $result, ?string $why = null, $value = null)
     {
         $this->assertions += 1;
 
@@ -275,7 +275,7 @@ class TestDriver
      *
      * @return string formatted value
      */
-    public function format($value, $detailed = false)
+    public function format($value, bool $detailed = false): string
     {
         if ($value instanceof Exception || $value instanceof Error) {
             return $detailed
@@ -303,7 +303,7 @@ class TestDriver
      *
      * @return string|null formatted file/line index (or NULL if unable to trace)
      */
-    public function trace()
+    public function trace(): ?string
     {
         $traces = debug_backtrace();
 

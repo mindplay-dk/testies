@@ -1,6 +1,11 @@
 <?php
 
-use mindplay\testies\TestConfiguration;
+namespace mindplay\testies;
+
+use Closure;
+use ReflectionClass;
+use ReflectionProperty;
+use Throwable;
 
 /**
  * Obtain or override the current test-configuration.
@@ -9,7 +14,7 @@ use mindplay\testies\TestConfiguration;
  *
  * @return TestConfiguration
  */
-function configure($config = null)
+function configure(TestConfiguration $config = null): TestConfiguration
 {
     static $active;
 
@@ -30,7 +35,7 @@ function configure($config = null)
  *
  * @return bool TRUE, if the specified option was enabled on the command-line
  */
-function enabled($option, $shorthand = "")
+function enabled(string $option, string $shorthand = ""): bool
 {
     return in_array(getopt($shorthand, [$option]), [[$option => false], [$shorthand => false]], true);
 }
@@ -38,13 +43,13 @@ function enabled($option, $shorthand = "")
 /**
  * Run all queued tests.
  *
- * Typical usage, after configuring your tests with calls to {@link test()}:
+ * Typical usage, after configuring your tests with calls to {@see test()}:
  *
  *     exit(run()); // exit with error-level for integration with CI tools, etc.
  *
  * @return int status code (0 on success; 1 on failure)
  */
-function run()
+function run(): int
 {
     $success = configure()->driver->run();
 
@@ -54,14 +59,14 @@ function run()
 /**
  * Queue a test for running
  *
- * To run all the queued tests (and get the result) call {@link @run()}
+ * To run all the queued tests (and get the result) call {@see @run()}
  *
  * @param string   $title    test title (short, concise description)
  * @param Closure $function test implementation
  *
  * @return void
  */
-function test($title, Closure $function)
+function test(string $title, Closure $function)
 {
     configure()->driver->addTest($title, $function);
 }
@@ -89,13 +94,13 @@ function teardown(Closure $function)
 /**
  * Check and report the result of an expression.
  *
- * @param bool   $result result of assertion (must === TRUE)
- * @param string $why    description of assertion
- * @param mixed  $value  optional value (displays on failure)
+ * @param bool        $result result of assertion (must === TRUE)
+ * @param string|null $why    optional description of assertion
+ * @param mixed       $value  optional value (displays on failure)
  *
  * @return void
  */
-function ok($result, $why = null, $value = null)
+function ok(bool $result, ?string $why = null, $value = null)
 {
     configure()->driver->printResult($result, $why, $value);
 }
@@ -103,13 +108,13 @@ function ok($result, $why = null, $value = null)
 /**
  * Compare an actual value against an expected value.
  *
- * @param mixed  $value    actual value
- * @param mixed  $expected expected value (must === $value)
- * @param string $why      description of assertion
+ * @param mixed       $value    actual value
+ * @param mixed       $expected expected value (must === $value)
+ * @param string|null $why      description of assertion
  *
  * @return void
  */
-function eq($value, $expected, $why = null)
+function eq($value, $expected, ?string $why = null)
 {
     $result = $value === $expected;
 
@@ -130,22 +135,22 @@ function eq($value, $expected, $why = null)
  *
  * @void
  */
-function expect($exception_type, $why, $function, $patterns = array())
+function expect(string $exception_type, string $why, callable $function, $patterns = [])
 {
     try {
         call_user_func($function);
-    } catch (Exception $e) {
-        if ($e instanceof $exception_type) {
+    } catch (Throwable $error) {
+        if ($error instanceof $exception_type) {
             foreach ((array) $patterns as $pattern) {
-                if (preg_match($pattern, $e->getMessage()) !== 1) {
-                    ok(false, "$why (expected {$exception_type} message did not match pattern: {$pattern})", $e);
+                if (preg_match($pattern, $error->getMessage()) !== 1) {
+                    ok(false, "$why (expected {$exception_type} message did not match pattern: {$pattern})", $error);
                     return;
                 }
             }
 
-            ok(true, $why, $e);
+            ok(true, $why, $error);
         } else {
-            $actual_type = get_class($e);
+            $actual_type = get_class($error);
 
             ok(false, "$why (expected {$exception_type} but {$actual_type} was thrown)");
         }
@@ -164,7 +169,7 @@ function expect($exception_type, $why, $function, $patterns = array())
  *
  * @return string formatted value
  */
-function format($value, $detailed = false)
+function format($value, bool $detailed = false): string
 {
     return configure()->driver->format($value, $detailed);
 }
@@ -178,7 +183,7 @@ function format($value, $detailed = false)
  *
  * @return mixed the return value from the function call
  */
-function invoke($object, $method_name, $arguments = array())
+function invoke($object, string $method_name, array $arguments = [])
 {
     $class = new ReflectionClass(get_class($object));
 
@@ -197,7 +202,7 @@ function invoke($object, $method_name, $arguments = array())
  *
  * @return mixed the property value
  */
-function inspect($object, $property_name)
+function inspect($object, string $property_name)
 {
     $property = new ReflectionProperty(get_class($object), $property_name);
 
