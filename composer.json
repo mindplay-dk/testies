@@ -13,11 +13,11 @@
         "php": ">= 7.1"
     },
     "require-dev": {
-        "phpunit/php-code-coverage": "^4",
-        "guzzlehttp/guzzle": "^5"
+        "phpunit/php-code-coverage": "^6.1.1",
+        "guzzlehttp/guzzle": "^6.3.3"
     },
     "suggest": {
-        "phpunit/php-code-coverage": "^4"
+        "phpunit/php-code-coverage": "^6.1.1"
     },
     "autoload": {
         "files": ["src/test.func.php"],
