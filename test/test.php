@@ -3,7 +3,7 @@
 use GuzzleHttp\Client;
 use mindplay\testies\TestConfiguration;
 use mindplay\testies\TestServer;
-use function mindplay\testies\{configure, test, ok, eq, expect, run, format, invoke, inspect};
+use function mindplay\testies\{configure, eq, expect, format, inspect, invoke, ok, run, test};
 
 require dirname(__DIR__) . "/vendor/autoload.php";
 
@@ -27,18 +27,21 @@ test(
         ok(true);
         ok(false);
 
-        ok(true, "T");
-        ok(false, "F");
+        ok(true, "why");
+        ok(false, "why");
 
-        ok(true, "T", "baz");
-        ok(false, "F", "bat\nbit");
+        ok(true, "why", "string");
+        ok(false, "why", "line 1\nline 2");
 
-        eq("a", "a");
-        eq("a", "a\nb\nc");
-        eq("a", "a\nb\nc", "because");
+        eq("string", "string"); // equal strings
 
-        eq("a", "a", "T");
-        eq("a", "b", "F");
+        // multi-line strings:
+
+        eq("line 1\nline 2\nline 3", "line 1\nline 2\nline 3"); // equal
+        eq("line 1\nline 2\nline 3", "line 1\nline 3\nline 4"); // not equal
+
+        eq("foo", "foo", "why");
+        eq("foo", "bar", "why");
 
         eq(format([1,2,3]), "array[3]");
         eq(format(true), "TRUE");
@@ -51,7 +54,7 @@ test(
 
         expect(
             RuntimeException::class,
-            "T",
+            "why",
             function () {
                 throw new RuntimeException("boom"); // succeeds
             }
@@ -59,7 +62,7 @@ test(
 
         expect(
             RuntimeException::class,
-            "T",
+            "why",
             function () {
                 throw new RuntimeException("booooooom");
             },
@@ -68,7 +71,7 @@ test(
 
         expect(
             RuntimeException::class,
-            "F",
+            "why",
             function () {
                 throw new RuntimeException("bam");
             },
@@ -77,7 +80,7 @@ test(
 
         expect(
             RuntimeException::class,
-            "F",
+            "why",
             function () {
                 // doesn't throw
             }
@@ -93,7 +96,7 @@ run();
 
 $result = ob_get_clean();
 
-//echo $result; exit;
+echo $result; exit;
 
 configure(new TestConfiguration());
 

@@ -118,11 +118,7 @@ function eq($value, $expected, ?string $why = null)
 {
     $result = $value === $expected;
 
-    $info = $result
-        ? format($value)
-        : "expected: " . format($expected, true) . ", got: " . format($value, true);
-
-    configure()->driver->printResult($result, ($why === null ? $info : ($result ? $why : "$why ($info)")));
+    configure()->driver->printResult($result, $why, $value, $expected);
 }
 
 /**
