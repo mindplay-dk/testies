@@ -96,19 +96,18 @@ run();
 
 $result = ob_get_clean();
 
-echo $result; exit;
-
 configure(new TestConfiguration());
-
-configure()->enableVerboseOutput();
 
 configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__) . "/src");
 
 test(
     "Check test result",
     function () use ($result) {
-        eq(trim($result), trim(str_replace("\r\n", "\n", file_get_contents(__DIR__ . "/expected-output.txt"))),
-            "should produce test-output as dictated in \"expected-output.txt\"");
+        $expected_output_path = __DIR__ . "/expected-output.txt";
+
+        ok(trim($result) === trim(str_replace("\r\n", "\n", file_get_contents($expected_output_path))),
+            "should produce test-output as dictated in \"expected-output.txt\"",
+            $result);
     }
 );
 
