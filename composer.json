@@ -9,8 +9,15 @@
             "email": "rasc@fynskemedier.dk"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://bitbucket.org/mindplaydk/test-interop.git"
+        }
+    ],
     "require": {
-        "php": ">= 7.1"
+        "php": ">= 7.1",
+        "test-interop/test-listener": "1.0.0.x-dev"
     },
     "require-dev": {
         "phpunit/php-code-coverage": "^6.1.1",

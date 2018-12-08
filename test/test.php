@@ -105,9 +105,8 @@ test(
     function () use ($result) {
         $expected_output_path = __DIR__ . "/expected-output.txt";
 
-        ok(trim($result) === trim(str_replace("\r\n", "\n", file_get_contents($expected_output_path))),
-            "should produce test-output as dictated in \"expected-output.txt\"",
-            $result);
+        eq(trim($result), trim(str_replace("\r\n", "\n", file_get_contents($expected_output_path))),
+            "should produce test-output as dictated in \"expected-output.txt\"");
     }
 );
 

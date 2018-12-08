@@ -22,8 +22,7 @@ class TestConfiguration
      */
     public function __construct(TestDriver $driver = null)
     {
-        $this->driver = $driver ?: $this->createDefaultDriver();
-
+        // TODO move to console report listener
         if (enabled("verbose", "v")) {
             $this->enableVerboseOutput();
         }
@@ -45,6 +44,8 @@ class TestConfiguration
      */
     public function enableCodeCoverage(string $output_path = null, $source_paths = [])
     {
+        // TODO move to coverage listener
+
         if (class_exists(CodeCoverage::class)) {
             try {
                 $coverage = new CodeCoverage();
@@ -67,49 +68,4 @@ class TestConfiguration
         return $this;
     }
 
-    /**
-     * Disables built-in strict error handling.
-     *
-     * @return $this
-     */
-    public function disableErrorHandler()
-    {
-        $this->driver->strict = false;
-
-        return $this;
-    }
-
-    /**
-     * Enable throwing of unexpected exceptions in tests (useful for debugging)
-     *
-     * @return $this
-     */
-    public function throwExceptions()
-    {
-        $this->driver->throw = true;
-
-        return $this;
-    }
-
-    /**
-     * Enables verbose output (outputs every successful assertion.)
-     *
-     * @return $this
-     */
-    public function enableVerboseOutput()
-    {
-        $this->driver->verbose = true;
-
-        return $this;
-    }
-
-    /**
-     * Creates the default test-driver (when none is given via constructor)
-     *
-     * @return TestDriver default test-driver
-     */
-    protected function createDefaultDriver()
-    {
-        return new TestDriver();
-    }
 }
