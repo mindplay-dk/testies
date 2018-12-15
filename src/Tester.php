@@ -3,7 +3,7 @@
 namespace mindplay\testies;
 
 use TestInterop\Common\AssertionResult;
-use TestInterop\TestCaseListener;
+use TestInterop\TestCase;
 use Throwable;
 
 class Tester
@@ -14,13 +14,13 @@ class Tester
     private $builder;
 
     /**
-     * @var TestCaseListener
+     * @var TestCase
      */
-    private $listener;
+    private $case;
 
-    public function __construct(TestResultBuilder $builder, TestCaseListener $listener)
+    public function __construct(TestResultBuilder $builder, TestCase $case)
     {
-        $this->listener = $listener;
+        $this->case = $case;
         $this->builder = $builder;
     }
 
@@ -43,7 +43,7 @@ class Tester
             $_result->setValue($value);
         }
 
-        $this->listener->addResult($_result);
+        $this->case->addResult($_result);
     }
 
     /**
@@ -65,7 +65,7 @@ class Tester
             $result->setMessage($why);
         }
 
-        $this->listener->addResult($result);
+        $this->case->addResult($result);
     }
 
     /**

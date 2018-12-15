@@ -5,7 +5,7 @@ namespace mindplay\testies;
 use Closure;
 
 /**
- * This model represents a self-contained suite of Test Cases, often
+ * This model represents a self-contained suite of Tests, often
  * described as either "unit", "integration" or "functional", etc.
  *
  * @see TestRunner::run()
@@ -23,9 +23,9 @@ class TestSuite
     private $properties;
 
     /**
-     * @var TestCase[]
+     * @var Test[]
      */
-    private $test_cases = [];
+    private $tests = [];
 
     /**
      * @param string $name       logical name of the test-suite.
@@ -39,22 +39,22 @@ class TestSuite
     }
 
     /**
-     * Add a Test Case to the Test Suite.
+     * Add a Test to this Suite.
      *
-     * @param string  $name     logical name of the Test Case
+     * @param string  $name     logical name of the Test
      * @param Closure $function function that performs the test
      */
     public function add(string $name, Closure $function)
     {
-        $this->test_cases[] = new TestCase($name, $function);
+        $this->tests[] = new Test($name, $function);
     }
 
     /**
-     * @return TestCase[]
+     * @return Test[]
      */
-    public function getTestCases(): array
+    public function getTests(): array
     {
-        return $this->test_cases;
+        return $this->tests;
     }
 
     public function getName(): string

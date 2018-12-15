@@ -11,13 +11,13 @@ use Throwable;
 class TestResultBuilder
 {
     /**
-     * @var TestCase
+     * @var Test
      */
-    private $case;
+    private $test;
 
-    public function __construct(TestCase $case)
+    public function __construct(Test $test)
     {
-        $this->case = $case;
+        $this->test = $test;
     }
 
     /**
@@ -93,7 +93,7 @@ class TestResultBuilder
     }
 
     /**
-     * Obtain a filename and line number index to the call that wasa made in the Test Case function.
+     * Obtain a filename and line number index to the call that wasa made in the Test function.
      *
      * @return string|null formatted file/line index (or NULL if unable to trace)
      */
@@ -113,7 +113,7 @@ class TestResultBuilder
                 continue; // skip closure
             }
 
-            if (($trace['file'] === __FILE__) && (@$trace['args'][0] === $this->case->getFunction())) {
+            if (($trace['file'] === __FILE__) && (@$trace['args'][0] === $this->test->getFunction())) {
                 $skip = 1;
                 $found = true;
                 continue; // skip call to run()

@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">= 7.1",
-        "test-interop/test-listener": "1.0.0.x-dev"
+        "test-interop/test-listener": "dev-flat-listener"
     },
     "require-dev": {
         "phpunit/php-code-coverage": "^6.1.1",

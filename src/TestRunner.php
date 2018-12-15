@@ -45,7 +45,7 @@ class TestRunner
     {
         // TODO add a built-in listener (maybe?) to check whether the test-suite passed/failed?
 
-        $test_listener = new CompositeTestListener($listeners);
+        $listener = new CompositeTestListener($listeners);
 
         if ($this->strict) {
             set_error_handler(function ($errno, $errstr, $errfile, $errline) {
@@ -57,33 +57,33 @@ class TestRunner
             });
         }
 
-        $suite_listener = $test_listener->beginTestSuite($suite->getName(), $suite->getProperties());
+        $listener->beginTestSuite($suite->getName(), $suite->getProperties());
 
-        foreach ($suite->getTestCases() as $case) {
-            $case_listener = $suite_listener->beginTestCase($case->getName());
+        foreach ($suite->getTests() as $test) {
+            $case = $listener->beginTestCase($test->getName());
 
-            $thrown = null;
+            $tester = new Tester(new TestResultBuilder($test), $case);
 
             try {
                 // TODO setup?
 
                 // TODO factory abstractions?
                 // TODO dependency injection
-                call_user_func($case->getFunction(), new Tester(new TestResultBuilder($case), $case_listener));
+                call_user_func($test->getFunction(), $tester);
 
                 // TODO teardown?
             } catch (Throwable $error) {
-                $case_listener->addError($error);
-
-                $thrown = $error;
+                $case->addError($error);
             }
 
-            if ($thrown && $this->throw) {
-                throw new Exception("Exception while running test: {$case->getName()}", 0, $thrown);
+            $listener->endTestCase();
+
+            if (isset($error) && $this->throw) {
+                throw new Exception("Exception while running test: {$test->getName()}", 0, $error);
             }
         }
 
-        $case_listener->end();
+        $listener->endTestSuite();
 
         if ($this->strict) {
             restore_error_handler();
@@ -99,9 +99,6 @@ class TestRunner
                 echo "\n* code coverage report created: {$this->coverage_output_path}\n";
             }
         }
-
-        // TODO test-interop needs some way to signal the end of the test-suite
-        //      (and probably some way to signal the end of the entire test?)
 
         // TODO move to console report listener
         $this->printSummary();

@@ -5,10 +5,10 @@ namespace mindplay\testies;
 use Closure;
 
 /**
- * This model represents the individual Test Case, essentially a function
+ * This model represents the individual Test, essentially a function
  * with a human-readable name.
  */
-class TestCase
+class Test
 {
     /**
      * @var string
@@ -21,7 +21,7 @@ class TestCase
     private $function;
 
     /**
-     * @param string  $name     logical name of the Test Case
+     * @param string  $name     logical name of the Test
      * @param Closure $function function that performs the test
      *
      * @internal
