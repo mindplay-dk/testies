@@ -124,6 +124,21 @@ class TestResultBuilder
             }
         }
 
+// TODO implement this simplified prototype
+//        $trace = debug_backtrace();
+//
+//        for ($i=count($trace); $i--;) {
+//            $entry = $trace[$i];
+//
+//            if (@$entry['class'] === TestRunner::class && @$entry['function'] === "run") {
+//                if (isset($trace[$i-2])) {
+//                    $found = $trace[$i-2];
+//
+//                    return "{$found['file']}:{$found['line']} ({$found['class']}::{$found['function']})";
+//                }
+//            }
+//        }
+
         return null;
     }
 
