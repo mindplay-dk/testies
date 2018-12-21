@@ -35,7 +35,7 @@ class TestResultBuilder
         // TODO move printing/diffing/formatting concerns to console report listener
 
         if ($this->verbose === false && $result === true) {
-            return; // quiet successful assertion
+            //return; // quiet successful assertion
         }
 
         if ($this->last_test !== $this->current_test) {

@@ -27,11 +27,11 @@ class Tester
     /**
      * Check and report the result of an expression.
      *
-     * @param bool        $result result of assertion (must === TRUE)
+     * @param bool        $result result of assertion
      * @param string|null $why    optional description of assertion
      * @param mixed       $value  optional value (displays on failure)
      */
-    public function ok($result, ?string $why = null, $value = null): void
+    public function ok(bool $result, ?string $why = null, $value = null): void
     {
         $_result = new AssertionResult($result, __FUNCTION__);
 
@@ -53,7 +53,7 @@ class Tester
      * @param mixed       $expected expected value (must === $value)
      * @param string|null $why      description of assertion
      */
-    public function same($value, $expected, ?string $why = null): void
+    public function eq($value, $expected, ?string $why = null): void
     {
         $result = new AssertionResult($value === $expected, __FUNCTION__);
 

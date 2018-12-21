@@ -1,15 +1,12 @@
 <?php
 
-use GuzzleHttp\Client;
-use mindplay\testies\TestConfiguration;
-use mindplay\testies\TestServer;
-use function mindplay\testies\{configure, eq, expect, format, inspect, invoke, ok, run, test};
+use mindplay\testies\Recording\TestRecorder;
+use mindplay\testies\Tester;
+use mindplay\testies\TestRunner;
+use mindplay\testies\TestSuite;
+use function mindplay\testies\{inspect, invoke};
 
 require dirname(__DIR__) . "/vendor/autoload.php";
-
-configure()->enableVerboseOutput();
-
-// TODO test for code-coverage output: configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__) . "/src");
 
 class Foo
 {
@@ -21,109 +18,112 @@ class Foo
     }
 }
 
-test(
-    "Hello World",
-    function () {
-        ok(true);
-        ok(false);
+// TODO test for code coverage
 
-        ok(true, "why");
-        ok(false, "why");
+$suite = new TestSuite("Integration Test");
 
-        ok(true, "why", "string");
-        ok(false, "why", "line 1\nline 2");
+$suite->add(
+    "Can run Test Suite",
+    function (Tester $is) {
+        $suite = new TestSuite("Mock Test");
 
-        eq("string", "string"); // equal strings
+        $suite->add(
+            "Hello World",
+            function (Tester $is) {
+                $is->ok(true);
+                $is->ok(false);
 
-        // multi-line strings:
+                $is->ok(true, "why");
+                $is->ok(false, "why");
 
-        eq("line 1\nline 2\nline 3", "line 1\nline 2\nline 3"); // equal
-        eq("line 1\nline 2\nline 3", "line 1\nline 3\nline 4"); // not equal
+                $is->ok(true, "why", "string");
+                $is->ok(false, "why", "line 1\nline 2");
 
-        eq("foo", "foo", "why");
-        eq("foo", "bar", "why");
+                $is->eq("string", "string"); // equal strings
 
-        eq(format([1,2,3]), "array[3]");
-        eq(format(true), "TRUE");
-        eq(format(false), "FALSE");
-        eq(format(new Foo), "Foo");
+                // multi-line strings:
 
-        eq(invoke(new Foo, "blip"), "blip");
+                $is->eq("line 1\nline 2\nline 3", "line 1\nline 2\nline 3"); // equal
+                $is->eq("line 1\nline 2\nline 3", "line 1\nline 3\nline 4"); // not equal
 
-        eq(inspect(new Foo, "bar"), "blip");
+                $is->eq("foo", "foo", "why");
+                $is->eq("foo", "bar", "why");
 
-        expect(
-            RuntimeException::class,
-            "why",
-            function () {
-                throw new RuntimeException("boom"); // succeeds
+//                $is->eq(format([1, 2, 3]), "array[3]");
+//                $is->eq(format(true), "TRUE");
+//                $is->eq(format(false), "FALSE");
+//                $is->eq(format(new Foo), "Foo");
+
+                $is->eq(invoke(new Foo, "blip"), "blip");
+
+                $is->eq(inspect(new Foo, "bar"), "blip");
+
+//                expect(
+//                    RuntimeException::class,
+//                    "why",
+//                    function () {
+//                        throw new RuntimeException("boom"); // succeeds
+//                    }
+//                );
+//
+//                expect(
+//                    RuntimeException::class,
+//                    "why",
+//                    function () {
+//                        throw new RuntimeException("booooooom");
+//                    },
+//                    "/bo+m/" // succeeds
+//                );
+//
+//                expect(
+//                    RuntimeException::class,
+//                    "why",
+//                    function () {
+//                        throw new RuntimeException("bam");
+//                    },
+//                    "/bo+m/" // fails
+//                );
+//
+//                expect(
+//                    RuntimeException::class,
+//                    "why",
+//                    function () {
+//                        // doesn't throw
+//                    }
+//                );
+
+                throw new RuntimeException("THE END");
             }
         );
 
-        expect(
-            RuntimeException::class,
-            "why",
-            function () {
-                throw new RuntimeException("booooooom");
-            },
-            "/bo+m/" // succeeds
-        );
+        $runner = new TestRunner();
 
-        expect(
-            RuntimeException::class,
-            "why",
-            function () {
-                throw new RuntimeException("bam");
-            },
-            "/bo+m/" // fails
-        );
+        $recorder = new TestRecorder();
 
-        expect(
-            RuntimeException::class,
-            "why",
-            function () {
-                // doesn't throw
-            }
-        );
+        $is->eq($runner->run($suite, [$recorder]), false, "the test should fail");
 
-        throw new RuntimeException("THE END");
+        $is->eq(count($recorder->getSuites()), 1);
+
+        // TODO test recorded results!
     }
 );
 
-ob_start();
+//test(
+//    "Can run a local test-server",
+//    function () {
+//        $server = new TestServer(__DIR__, 8088);
+//
+//        $client = new Client();
+//
+//        $response = $client->get("http://127.0.0.1:8088/server.php");
+//
+//        eq($response->getStatusCode(), 200, "it should return a 200 status code");
+//        ok($response->getBody() == "it works!", "it should return the script output");
+//
+//        unset($server);
+//    }
+//);
 
-run();
+$runner = new TestRunner();
 
-$result = ob_get_clean();
-
-configure(new TestConfiguration());
-
-configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__) . "/src");
-
-test(
-    "Check test result",
-    function () use ($result) {
-        $expected_output_path = __DIR__ . "/expected-output.txt";
-
-        eq(trim($result), trim(str_replace("\r\n", "\n", file_get_contents($expected_output_path))),
-            "should produce test-output as dictated in \"expected-output.txt\"");
-    }
-);
-
-test(
-    "Can run a local test-server",
-    function () {
-        $server = new TestServer(__DIR__, 8088);
-
-        $client = new Client();
-
-        $response = $client->get("http://127.0.0.1:8088/server.php");
-
-        eq($response->getStatusCode(), 200, "it should return a 200 status code");
-        ok($response->getBody() == "it works!", "it should return the script output");
-
-        unset($server);
-    }
-);
-
-exit(run()); // exits with errorlevel (for CI tools etc.)
+exit($runner->run($suite, []) ? 0 : 1); // exits with errorlevel (for CI tools etc.)

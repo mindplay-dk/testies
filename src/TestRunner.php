@@ -3,7 +3,7 @@
 namespace mindplay\testies;
 
 use ErrorException;
-use Exception;
+use RuntimeException;
 use TestInterop\Common\CompositeTestListener;
 use TestInterop\TestListener;
 use Throwable;
@@ -40,6 +40,8 @@ class TestRunner
      * @param TestListener[] $listeners
      *
      * @return bool true on success, false on failure
+     *
+     * @throws RuntimeException for unexpected test-failure (only if the `$throw` option is enabled)
      */
     public function run(TestSuite $suite, array $listeners): bool
     {
@@ -79,7 +81,7 @@ class TestRunner
             $listener->endTestCase();
 
             if (isset($error) && $this->throw) {
-                throw new Exception("Exception while running test: {$test->getName()}", 0, $error);
+                throw new RuntimeException("Exception while running test: {$test->getName()}", 0, $error);
             }
         }
 
@@ -90,17 +92,19 @@ class TestRunner
         }
 
         // TODO move to coverage listener
-        if ($this->coverage) {
-            $this->printCodeCoverageResult($this->coverage);
-
-            if ($this->coverage_output_path) {
-                $this->outputCodeCoverageReport($this->coverage, $this->coverage_output_path);
-
-                echo "\n* code coverage report created: {$this->coverage_output_path}\n";
-            }
-        }
+//        if ($this->coverage) {
+//            $this->printCodeCoverageResult($this->coverage);
+//
+//            if ($this->coverage_output_path) {
+//                $this->outputCodeCoverageReport($this->coverage, $this->coverage_output_path);
+//
+//                echo "\n* code coverage report created: {$this->coverage_output_path}\n";
+//            }
+//        }
 
         // TODO move to console report listener
-        $this->printSummary();
+//        $this->printSummary();
+
+        return true; // TODO proper test-result? or maybe remove the return-value altogether??
     }
 }
