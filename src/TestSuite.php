@@ -32,7 +32,7 @@ class TestSuite
      * @param array  $properties optional properties, such as environment variables
      *                           or test-suite configuration settings.
      */
-    public function __construct(string $name, array $properties)
+    public function __construct(string $name, array $properties = [])
     {
         $this->name = $name;
         $this->properties = $properties;
