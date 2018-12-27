@@ -4,6 +4,7 @@ namespace mindplay\testies;
 
 use ErrorException;
 use Exception;
+use TestInterop\Common\CompositeTestCase;
 use TestInterop\Common\CompositeTestListener;
 use TestInterop\TestListener;
 use Throwable;
@@ -59,8 +60,13 @@ class TestRunner
 
         $listener->beginTestSuite($suite->getName(), $suite->getProperties());
 
+        $result = new TestResult();
+
         foreach ($suite->getTests() as $test) {
-            $case = $listener->beginTestCase($test->getName());
+            $case = new CompositeTestCase([
+                $result,
+                $listener->beginTestCase($test->getName())
+            ]);
 
             $tester = new Tester(new TestResultBuilder($test), $case);
 
