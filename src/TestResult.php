@@ -32,12 +32,12 @@ class TestResult implements TestCase
 
     public function setSkipped(string $reason): void
     {
-        // nothing here.
+        // skipping a test does not affect the result.
     }
 
     public function setDisabled(string $reason): void
     {
-        // nothing here.
+        // disabling a test does not affect the result.
     }
 
     public function hasErrors(): bool
