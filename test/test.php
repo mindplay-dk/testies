@@ -23,6 +23,46 @@ class Foo
 $suite = new TestSuite("Integration Test");
 
 $suite->add(
+    "Can measure Test Result",
+    function (Tester $is) {
+        $suite = new TestSuite("Mock Test");
+
+        $runner = new TestRunner();
+
+        $is->eq($runner->run($suite, []), true, "an empty Test Suite passes by default");
+
+        $suite->add(
+            "Successful Case",
+            function (Tester $is) {
+                $is->ok(true);
+            }
+        );
+
+        $is->eq($runner->run($suite, []), true, "succesful assertions generate a passing test");
+
+        $suite->add(
+            "Fail Case",
+            function (Tester $is) {
+                $is->ok(false);
+            }
+        );
+
+        $is->eq($runner->run($suite, []), false, "failed assertions generate a failing test");
+
+        $bad_suite = new TestSuite("Mock Test");
+
+        $bad_suite->add(
+            "Fail Case",
+            function () {
+                throw new Exception();
+            }
+        );
+
+        $is->eq($runner->run($bad_suite, []), false, "unexpected error generates a failing test");
+    }
+);
+
+$suite->add(
     "Can run Test Suite",
     function (Tester $is) {
         $suite = new TestSuite("Mock Test");

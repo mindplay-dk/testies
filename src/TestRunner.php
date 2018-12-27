@@ -111,6 +111,6 @@ class TestRunner
         // TODO move to console report listener
 //        $this->printSummary();
 
-        return true; // TODO proper test-result? or maybe remove the return-value altogether??
+        return ! $result->hasErrors();
     }
 }
