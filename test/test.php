@@ -4,7 +4,6 @@ use mindplay\testies\Recording\TestRecorder;
 use mindplay\testies\Tester;
 use mindplay\testies\TestRunner;
 use mindplay\testies\TestSuite;
-use function mindplay\testies\{inspect, invoke};
 
 require dirname(__DIR__) . "/vendor/autoload.php";
 
@@ -69,71 +68,7 @@ $suite->add(
 
         $suite->add(
             "Hello World",
-            function (Tester $is) {
-                $is->ok(true);
-                $is->ok(false);
-
-                $is->ok(true, "why");
-                $is->ok(false, "why");
-
-                $is->ok(true, "why", "string");
-                $is->ok(false, "why", "line 1\nline 2");
-
-                $is->eq("string", "string"); // equal strings
-
-                // multi-line strings:
-
-                $is->eq("line 1\nline 2\nline 3", "line 1\nline 2\nline 3"); // equal
-                $is->eq("line 1\nline 2\nline 3", "line 1\nline 3\nline 4"); // not equal
-
-                $is->eq("foo", "foo", "why");
-                $is->eq("foo", "bar", "why");
-
-//                $is->eq(format([1, 2, 3]), "array[3]");
-//                $is->eq(format(true), "TRUE");
-//                $is->eq(format(false), "FALSE");
-//                $is->eq(format(new Foo), "Foo");
-
-                $is->eq(invoke(new Foo, "blip"), "blip");
-
-                $is->eq(inspect(new Foo, "bar"), "blip");
-
-//                expect(
-//                    RuntimeException::class,
-//                    "why",
-//                    function () {
-//                        throw new RuntimeException("boom"); // succeeds
-//                    }
-//                );
-//
-//                expect(
-//                    RuntimeException::class,
-//                    "why",
-//                    function () {
-//                        throw new RuntimeException("booooooom");
-//                    },
-//                    "/bo+m/" // succeeds
-//                );
-//
-//                expect(
-//                    RuntimeException::class,
-//                    "why",
-//                    function () {
-//                        throw new RuntimeException("bam");
-//                    },
-//                    "/bo+m/" // fails
-//                );
-//
-//                expect(
-//                    RuntimeException::class,
-//                    "why",
-//                    function () {
-//                        // doesn't throw
-//                    }
-//                );
-
-                throw new RuntimeException("THE END");
-            }
+            require __DIR__ . "/_mock_test.php"
         );
 
         $runner = new TestRunner();

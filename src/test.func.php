@@ -1,13 +1,32 @@
 <?php
 
+/**
+ * This file defines global functions.
+ *
+ * These functions either have no dependencies, or depend only on PHP globals or environment,
+ * and as such there's no reason for any of these to be methods of any object or class.
+ */
+
 namespace mindplay\testies;
 
-use Closure;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionProperty;
-use Throwable;
 
-// TODO figure out where to put the reflection facilities
+/**
+ * Tests if a given option is enabled on the command-line.
+ *
+ * For example, `if (enabled('skip-slow'))` checks for a `--skip-slow` option.
+ *
+ * @param string $option    option name
+ * @param string $shorthand single-letter shorthand (optional)
+ *
+ * @return bool TRUE, if the specified option was enabled on the command-line
+ */
+function enabled(string $option, string $shorthand = ""): bool
+{
+    return in_array(getopt($shorthand, [$option]), [[$option => false], [$shorthand => false]], true);
+}
 
 /**
  * Invoke a protected or private method (by means of reflection)
@@ -17,6 +36,8 @@ use Throwable;
  * @param array  $arguments   arguments to pass to the function
  *
  * @return mixed the return value from the function call
+ *
+ * @throws ReflectionException on failure
  */
 function invoke($object, string $method_name, array $arguments = [])
 {
@@ -36,6 +57,8 @@ function invoke($object, string $method_name, array $arguments = [])
  * @param string $property_name the property name
  *
  * @return mixed the property value
+ *
+ * @throws ReflectionException on failure
  */
 function inspect($object, string $property_name)
 {

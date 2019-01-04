@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/mindplaydk/test-interop.git",
-                "reference": "e891e5b101a3028a2ff5be3c2be6fa560a69ff1b"
+                "reference": "dbf6fc3e3f8e346bc2f797c37b7fbb2651a12232"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/mindplaydk/test-interop/get/e891e5b101a3028a2ff5be3c2be6fa560a69ff1b.zip",
-                "reference": "e891e5b101a3028a2ff5be3c2be6fa560a69ff1b",
+                "url": "https://bitbucket.org/mindplaydk/test-interop/get/dbf6fc3e3f8e346bc2f797c37b7fbb2651a12232.zip",
+                "reference": "dbf6fc3e3f8e346bc2f797c37b7fbb2651a12232",
                 "shasum": ""
             },
             "require": {
@@ -35,10 +35,10 @@
             "description": "Interoperability model for streaming test-listeners",
             "homepage": "https://bitbucket.org/mindplaydk/test-interop",
             "support": {
-                "source": "https://bitbucket.org/mindplaydk/test-interop/src/e891e5b101a3028a2ff5be3c2be6fa560a69ff1b/?at=flat-listener",
+                "source": "https://bitbucket.org/mindplaydk/test-interop/src/dbf6fc3e3f8e346bc2f797c37b7fbb2651a12232/?at=flat-listener",
                 "issues": "https://bitbucket.org/mindplaydk/test-interop/issues"
             },
-            "time": "2018-12-27T19:09:17+00:00"
+            "time": "2019-01-02T17:59:43+00:00"
         }
     ],
     "packages-dev": [

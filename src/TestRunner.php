@@ -22,21 +22,6 @@ class TestRunner
     public $throw = false;
 
     /**
-     * Tests if a given option is enabled on the command-line.
-     *
-     * For example, `if (enabled('skip-slow'))` checks for a `--skip-slow` option.
-     *
-     * @param string $option    option name
-     * @param string $shorthand single-letter shorthand (optional)
-     *
-     * @return bool TRUE, if the specified option was enabled on the command-line
-     */
-    public function enabled(string $option, string $shorthand = ""): bool
-    {
-        return in_array(getopt($shorthand, [$option]), [[$option => false], [$shorthand => false]], true);
-    }
-
-    /**
      * @param TestSuite      $suite
      * @param TestListener[] $listeners
      *
