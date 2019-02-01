@@ -1,6 +1,7 @@
 <?php
 
 use mindplay\testies\Recording\TestRecorder;
+use mindplay\testies\Reporting\TestReporter;
 use mindplay\testies\Tester;
 use mindplay\testies\TestRunner;
 use mindplay\testies\TestSuite;
@@ -79,6 +80,8 @@ $suite->add(
 
         $is->eq(count($recorder->getSuites()), 1);
 
+//        var_dump($recorder);
+
         // TODO test recorded results!
     }
 );
@@ -101,4 +104,4 @@ $suite->add(
 
 $runner = new TestRunner();
 
-exit($runner->run($suite, []) ? 0 : 1); // exits with errorlevel (for CI tools etc.)
+exit($runner->run($suite, [new TestReporter()]) ? 0 : 1); // exits with errorlevel (for CI tools etc.)

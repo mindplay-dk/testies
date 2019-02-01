@@ -55,7 +55,7 @@ class TestRunner
                 $listener->beginTestCase($test->getName())
             ]);
 
-            $tester = new Tester(new TestResultBuilder($test), $case);
+            $tester = new Tester($test, $case);
 
             try {
                 // TODO setup?
