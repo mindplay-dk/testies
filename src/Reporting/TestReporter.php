@@ -84,7 +84,7 @@ class TestReporter implements TestListener, TestCase
         }
 
         if ($this->last_test !== $this->current_test) {
-            $this->printTitle($this->current_test);
+            $this->printTitle($this->current_test_name);
 
             $this->last_test = $this->current_test;
         }
@@ -121,8 +121,10 @@ class TestReporter implements TestListener, TestCase
             ? " " . basename($result->getFile()) . ":" . $result->getLine()
             : "";
 
-        $message = $result->getMessage()
-            ? " " . $result->getMessage()
+        $message = $result->getMessage() ?: $result->getType();
+
+        $message = $message
+            ? " {$message}"
             : "";
 
         echo ($result->getResult() === true ? "PASS" : "FAIL") . $trace . $message . $output . "\n";

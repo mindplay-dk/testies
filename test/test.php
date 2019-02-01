@@ -18,6 +18,25 @@ class Foo
     }
 }
 
+// TODO move this + the test-case to the mock test-suite
+class MyHelper
+{
+    /**
+     * @var Tester
+     */
+    private $tester;
+
+    public function __construct(Tester $tester)
+    {
+        $this->tester = $tester;
+    }
+
+    public function isWorstCase()
+    {
+        $this->tester->ok(true, "MY TEST");
+    }
+}
+
 // TODO test for code coverage
 
 $suite = new TestSuite("Integration Test");
@@ -25,6 +44,14 @@ $suite = new TestSuite("Integration Test");
 $suite->add(
     "Can measure Test Result",
     function (Tester $is) {
+
+
+        $helper = new MyHelper($is);
+
+        $helper->isWorstCase();
+
+
+
         $suite = new TestSuite("Mock Test");
 
         $runner = new TestRunner();
@@ -80,9 +107,15 @@ $suite->add(
 
         $is->eq(count($recorder->getSuites()), 1);
 
-//        var_dump($recorder);
+        $suite = $recorder->getSuites()[0];
 
-        // TODO test recorded results!
+        $is->eq(count($suite->getCases()), 1);
+
+        $case = $suite->getCases()[0];
+
+        $results = $case->getResults();
+
+        $is->eq($results[0]->getResult(), "");
     }
 );
 

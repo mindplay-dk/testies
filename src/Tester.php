@@ -2,10 +2,12 @@
 
 namespace mindplay\testies;
 
-use function func_num_args;
+use ReflectionFunction;
 use TestInterop\Common\AssertionResult;
 use TestInterop\TestCase;
 use Throwable;
+use function debug_backtrace;
+use function func_num_args;
 
 // TODO QA: I'm going with this design for now, but will review when it's done.
 //          It kinda seems like this class has two responsibilities...
@@ -150,45 +152,23 @@ class Tester
      */
     private function trace(?string &$file, ?int &$line): void
     {
-        $traces = debug_backtrace();
+        $frames = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
 
-        $skip = 0;
+        $test_file = (new ReflectionFunction($this->test->getFunction()))->getFileName();
 
-        $found = false;
+        for ($i = count($frames); $i--;) {
+            $frame = $frames[$i];
 
-        while (count($traces)) {
-            $trace = array_pop($traces);
-
-            if ($skip > 0) {
-                $skip -= 1;
-                continue; // skip closure
+            if (@$frame["class"] === TestRunner::class) {
+                continue;
             }
 
-            if (($trace['file'] ?? null === __FILE__) && (@$trace['args'][0] === $this->test->getFunction())) {
-                $skip = 1;
-                $found = true;
-                continue; // skip call to run()
-            }
+            if (@$frame["file"] === $test_file) {
+                $file = @$frame["file"];
+                $line = @$frame["line"];
 
-            if ($found && isset($trace['file'])) {
-                $file = $trace['file'];
-                $line = $trace['line'];
+                break;
             }
         }
-
-// TODO implement this simplified prototype
-//        $trace = debug_backtrace();
-//
-//        for ($i=count($trace); $i--;) {
-//            $entry = $trace[$i];
-//
-//            if (@$entry['class'] === TestRunner::class && @$entry['function'] === "run") {
-//                if (isset($trace[$i-2])) {
-//                    $found = $trace[$i-2];
-//
-//                    return "{$found['file']}:{$found['line']} ({$found['class']}::{$found['function']})";
-//                }
-//            }
-//        }
     }
 }
