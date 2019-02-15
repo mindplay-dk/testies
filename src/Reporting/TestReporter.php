@@ -2,6 +2,8 @@
 
 namespace mindplay\testies\Reporting;
 
+use ReflectionClass;
+use stdClass;
 use TestInterop\AssertionResult;
 use TestInterop\TestCase;
 use TestInterop\TestListener;
@@ -10,7 +12,6 @@ use function basename;
 use function explode;
 use function get_class;
 use function mindplay\testies\enabled;
-use function print_r;
 use function strpos;
 use function trim;
 
@@ -168,29 +169,139 @@ class TestReporter implements TestListener, TestCase
     {
         // TODO formatter abstraction
 
-        if ($value instanceof Throwable) {
-            $details = $value->getMessage();
+        return $this->formatValue($value, "", $detailed);
+    }
 
-            if ($detailed) {
-                $details .= "\n\nStacktrace:\n" . $value->getTraceAsString();
-            }
+    /**
+     * @param mixed  $value    the value to format for display
+     * @param string $indent   indentation string
+     * @param bool   $detailed true to format the value with more detail
+     *
+     * @return string
+     */
+    private function formatValue($value, string $indent, bool $detailed): string
+    {
+        $type = is_array($value) && is_callable($value)
+            ? "callable"
+            : strtolower(gettype($value));
 
-            return get_class($value) . ":\n{$details}";
+        switch ($type) {
+            case "boolean":
+                return $value ? "TRUE" : "FALSE";
+
+            case "integer":
+                return number_format($value, 0, "", "");
+
+            case "double":
+                $formatted = sprintf("%.6g", $value);
+
+                return $value == $formatted
+                    ? "{$formatted}"
+                    : "~{$formatted}";
+
+            case "string":
+                return '"' . strtr($value, ["\r" => '\\r', '"' => '\\"']) . '"';
+
+            case "array":
+                return $detailed
+                    ? "[" . $this->formatArrayValues($value, "{$indent}  ") . "{$indent}]"
+                    : "array[" . count($value) . "]";
+
+            case "object":
+                if ($value instanceof Throwable) {
+                    $details = $value->getMessage();
+
+                    if ($detailed) {
+                        $details .= "\n\nStacktrace:\n" . $value->getTraceAsString();
+                    }
+
+                    return get_class($value) . ":\n{$details}";
+                }
+
+                return $detailed
+                    ? $this->formatObject($value, $indent)
+                    : "{" . get_class($value) . "}";
+
+            case "resource":
+            case "resource (closed)":
+                return "{" . get_resource_type($value) . "}";
+
+            case "callable":
+                return is_object($value[0])
+                    ? "{" . get_class($value[0]) . "}->{$value[1]}()"
+                    : "{$value[0]}::{$value[1]}()";
+
+            case "null":
+                return "null";
         }
 
-        if (! $detailed && is_array($value)) {
-            return 'array[' . count($value) . ']';
+        return "{{$type}}"; // unsupported types (including "unknown type")
+    }
+
+    private function formatObject($object, string $indent): string
+    {
+        static $stack = [];
+
+        if (in_array($object, $stack, true)) {
+            return "{" . get_class($object) . "}";
         }
 
-        if (is_bool($value)) {
-            return $value ? 'TRUE' : 'FALSE';
+        $stack[] = $object;
+
+        $type = $object instanceof stdClass ? "" : get_class($object);
+
+        $formatted = "{" . $type . $this->formatProperties($object, "{$indent}  ") . "{$indent}}";
+
+        array_pop($stack);
+
+        return $formatted;
+    }
+
+    private function formatProperties($object, string $indent = ""): string
+    {
+        $values = $this->getObjectProperties($object);
+
+        $formatted = [];
+
+        foreach ($values as $name => $value) {
+            $formatted[] = "\n{$indent}\${$name} = " . $this->formatValue($value, $indent, true);
         }
 
-        if (is_object($value) && ! $detailed) {
-            return get_class($value);
+        return implode(",", $formatted) . (count($formatted) ? "\n" : "");
+    }
+
+    private function formatArrayValues(array $values, string $indent = ""): string
+    {
+        $formatted = [];
+
+        foreach ($values as $name => $value) {
+            $name = is_int($name)
+                ? "{$name}"
+                : "\"{$name}\"";
+
+            $formatted[] = "\n{$indent}{$name} => " . $this->formatValue($value, $indent, true);
         }
 
-        return print_r($value, true);
+        return implode(",", $formatted) . (count($formatted) ? "\n" : "");
+    }
+
+    private function getObjectProperties($object): array
+    {
+        if ($object instanceof stdClass) {
+            return (array) $object;
+        }
+
+        $reflection = new ReflectionClass($object);
+
+        $props = [];
+
+        foreach ($reflection->getProperties() as $prop) {
+            $prop->setAccessible(true);
+
+            $props[$prop->getName()] = $prop->getValue($object);
+        }
+
+        return $props;
     }
 
     /**
