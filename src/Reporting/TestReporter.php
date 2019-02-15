@@ -80,7 +80,7 @@ class TestReporter implements TestListener, TestCase
     public function addResult(AssertionResult $result): void
     {
         if ($this->verbose === false && $result->getResult() === true) {
-            //return; // quiet successful assertion
+            return; // quiet successful assertion
         }
 
         if ($this->last_test !== $this->current_test) {
@@ -187,10 +187,14 @@ class TestReporter implements TestListener, TestCase
         }
 
         if (is_object($value) && ! $detailed) {
-            return get_class($value);
+            return "{" . get_class($value) . "}";
         }
 
-        return print_r($value, true);
+        if (is_null($value)) {
+            return "null";
+        }
+
+        return str_replace("\r\n", "\n", print_r($value, true));
     }
 
     /**
@@ -231,11 +235,13 @@ class TestReporter implements TestListener, TestCase
         $result = "";
         $diff = self::diff(explode("\n", $old), explode("\n", $new));
 
+        $added = self::COLOR_GREEN . "+ ";
+        $removed = self::COLOR_RED . "- ";
+
         foreach ($diff as $node) {
             if (is_array($node)) {
-                $result .= (! empty($node["d"]) ? self::COLOR_RED . "+ " . implode("\n", $node["d"]) : "") .
-                    (! empty($node["i"]) ? self::COLOR_GREEN . "- " . implode("\n", $node["i"]) : "")
-                    . "\n";
+                $result .= (! empty($node["d"]) ? $removed . implode("\n{$removed}", $node["d"]) . "\n" : "") .
+                    (! empty($node["i"]) ? $added . implode("\n{$added}", $node["i"]) . "\n" : "");
             } else {
                 $result .= self::COLOR_RESET . "  " . $node . "\n";
             }
