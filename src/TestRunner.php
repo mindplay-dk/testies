@@ -93,9 +93,6 @@ class TestRunner
 //            }
 //        }
 
-        // TODO move to console report listener
-//        $this->printSummary();
-
         return ! $result->hasErrors();
     }
 }

@@ -135,6 +135,16 @@ $suite->add(
 //    }
 //);
 
+$suite = new TestSuite("Mock Test");
+$suite->add(
+    "Hello World",
+    require __DIR__ . "/_mock_test.php"
+);
+$runner = new TestRunner();
+$runner->run($suite, [new TestReporter(true)]);
+exit; // TODO internally test the output of the mock test-suite
+
+
 $runner = new TestRunner();
 
 exit($runner->run($suite, [new TestReporter()]) ? 0 : 1); // exits with errorlevel (for CI tools etc.)

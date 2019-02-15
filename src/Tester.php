@@ -84,7 +84,7 @@ class Tester
             if ($error instanceof $exception_type) {
                 foreach ((array) $patterns as $pattern) {
                     if (preg_match($pattern, $error->getMessage()) !== 1) {
-                        $this->addResult(false, __FUNCTION__, [], "$message (expected {$exception_type} message did not match pattern: {$pattern})", $error);
+                        $this->addResult(false, __FUNCTION__, [], "$message (message pattern mismatch: {$pattern})", $error);
                         return;
                     }
                 }

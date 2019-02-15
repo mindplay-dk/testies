@@ -60,7 +60,7 @@ class TestReporter implements TestListener, TestCase
 
     public function endTestSuite(): void
     {
-        // TODO: Implement endTestSuite() method.
+        // TODO $this->printSummary();
     }
 
     public function beginTestCase(string $name, ?string $className = null): TestCase
@@ -132,16 +132,12 @@ class TestReporter implements TestListener, TestCase
 
     public function addError(Throwable $error): void
     {
-        echo __METHOD__ . $error->getMessage() . "\n" . $error->getTraceAsString();
-        die();
-        // TODO: Implement addError() method.
+        echo "ERROR:\n" . $this->indent($this->format($error, true)) . "\n";
     }
 
     public function setSkipped(string $reason): void
     {
-        echo __METHOD__ . "\n" . $reason;
-        die();
-        // TODO: Implement setSkipped() method.
+        echo "SKIPPED: {$reason}\n";
     }
 
     /**
@@ -169,13 +165,14 @@ class TestReporter implements TestListener, TestCase
         // TODO formatter abstraction
 
         if ($value instanceof Throwable) {
-            $details = $value->getMessage();
-
             if ($detailed) {
-                $details .= "\n\nStacktrace:\n" . $value->getTraceAsString();
+                return get_class($value) . ": "
+                    . "\"" . $value->getMessage() . "\""
+                    . "\nin " . $value->getFile() . ":" . $value->getLine()
+                    . "\n" . $value->getTraceAsString();
             }
 
-            return get_class($value) . ":\n{$details}";
+            return get_class($value);
         }
 
         if (! $detailed && is_array($value)) {

@@ -24,51 +24,54 @@ return function (Tester $is) {
     $is->eq("line 1\nline 2\nline 3", "line 1\nline 2\nline 3"); // equal multi-line strings
     $is->eq("line 1\nline 2\nline 3", "line 1\nline 2\nline 3", "why"); // equal multi-line strings + why
 
-    $is->eq("line 1\nline 2\nline 3", "line 1\nline 3\nline 4"); // non-equal multi-line strings
+    $is->eq("line 1\nline 2\nline 3\nline 4", "line 1\nline 4\nline 5"); // non-equal multi-line strings
     $is->eq("line 1\nline 2\nline 3", "line 1\nline 3\nline 4", "why"); // non-equal multi-line strings + why
 
-//                $is->eq(format([1, 2, 3]), "array[3]");
-//                $is->eq(format(true), "TRUE");
-//                $is->eq(format(false), "FALSE");
-//                $is->eq(format(new Foo), "Foo");
+    $is->eq(
+        (object) [
+            "foo" => ["line 1\nline 2"],
+            "bar" => ["line 1\nline 2"]
+        ],
+        (object) [
+            "foo" => ["line 2\nline 3"],
+            "bar" => ["line 1\nline 2"]
+        ],
+        "why"
+    );
 
-//    $is->eq(invoke(new Foo, "blip"), "blip");
-//
-//    $is->eq(inspect(new Foo, "bar"), "blip");
+    $is->expect(
+        RuntimeException::class,
+        "why",
+        function () {
+            throw new RuntimeException("boom"); // succeeds
+        }
+    );
 
-//                expect(
-//                    RuntimeException::class,
-//                    "why",
-//                    function () {
-//                        throw new RuntimeException("boom"); // succeeds
-//                    }
-//                );
-//
-//                expect(
-//                    RuntimeException::class,
-//                    "why",
-//                    function () {
-//                        throw new RuntimeException("booooooom");
-//                    },
-//                    "/bo+m/" // succeeds
-//                );
-//
-//                expect(
-//                    RuntimeException::class,
-//                    "why",
-//                    function () {
-//                        throw new RuntimeException("bam");
-//                    },
-//                    "/bo+m/" // fails
-//                );
-//
-//                expect(
-//                    RuntimeException::class,
-//                    "why",
-//                    function () {
-//                        // doesn't throw
-//                    }
-//                );
+    $is->expect(
+        RuntimeException::class,
+        "why",
+        function () {
+            throw new RuntimeException("booooooom");
+        },
+        "/bo+m/" // succeeds
+    );
 
-//    throw new RuntimeException("THE END");
+    $is->expect(
+        RuntimeException::class,
+        "why",
+        function () {
+            throw new RuntimeException("bam");
+        },
+        "/bo+m/" // fails
+    );
+
+    $is->expect(
+        RuntimeException::class,
+        "why",
+        function () {
+            // doesn't throw
+        }
+    );
+
+    throw new RuntimeException("THE END");
 };
