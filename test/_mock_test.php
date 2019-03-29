@@ -2,7 +2,32 @@
 
 use mindplay\testies\Tester;
 
+class WordTester
+{
+    /**
+     * @var Tester
+     */
+    private $tester;
+
+    public function __construct(Tester $tester)
+    {
+        $this->tester = $tester;
+    }
+
+    public function containTest(string $str)
+    {
+        $this->tester->addResult(\stripos($str, "test") !== false, __FUNCTION__, [], "\"{$str}\" should contain the word 'test'");
+    }
+
+    public function dontContainTest(string $str)
+    {
+        $this->tester->addResult(\stripos($str, "test") === false, __FUNCTION__);
+    }
+}
+
 return function (Tester $is) {
+    // Basic assertions:
+
     $is->ok(true);
     $is->ok(false);
 
@@ -14,6 +39,8 @@ return function (Tester $is) {
 
     $is->ok(false, "why", "line 1\nline 2"); // multi-line string
     $is->ok(false, "why", [1,2,3]); // array
+
+    // Equality assertions:
 
     $is->eq("string", "string"); // equal values
     $is->eq("string", "string", "why"); // equal values + why
@@ -38,6 +65,18 @@ return function (Tester $is) {
         ],
         "why"
     );
+
+    // Custom assertions:
+
+    $words = new WordTester($is);
+
+    $words->containTest("this contains test");
+
+    $words->containTest("this doesn't");
+
+    $words->dontContainTest("this contains test");
+
+    // Expected exceptions:
 
     $is->expect(
         RuntimeException::class,

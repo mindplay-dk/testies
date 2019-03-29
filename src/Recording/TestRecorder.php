@@ -8,6 +8,11 @@ use TestInterop\TestListener;
 
 /**
  * Test Listener implementation that silently records every event for later inspection.
+ *
+ * TODO maybe repurpose this into a test record/playback facility, if that's useful?
+ *      otherwise, remove it - the idea was to use this to test integration with
+ *      test-listeners, but we have real test-listeners (such as TestReporter) that
+ *      fulfill the same purpose, so we don't need it for that...
  */
 class TestRecorder implements TestListener
 {

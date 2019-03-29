@@ -115,14 +115,14 @@ class Tester
      * @param mixed       $value    actual value (optional)
      * @param mixed       $expected expected value (optional)
      */
-    protected function addResult(bool $result, string $type, array $context = [], ?string $message = null, $value = null, $expected = null)
+    public function addResult(bool $result, string $type, array $context = [], ?string $message = null, $value = null, $expected = null)
     {
         $result = new AssertionResult($result, $type);
 
         $file = null;
         $line = null;
 
-        $this->trace($file, $line);
+        [$file, $line] = $this->trace();
 
         if ($file !== null) {
             $result->setFile($file);
@@ -147,10 +147,9 @@ class Tester
     /**
      * Obtain a filename and line number to the call that was made in the Test function.
      *
-     * @param string|null &$file
-     * @param int|null    &$line
+     * @return array where: [string $file, int $line]
      */
-    private function trace(?string &$file, ?int &$line): void
+    private function trace(): array
     {
         $frames = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
 
@@ -170,5 +169,7 @@ class Tester
                 break;
             }
         }
+
+        return [$file, $line];
     }
 }

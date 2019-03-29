@@ -1,6 +1,6 @@
 <?php
 
-use mindplay\testies\Recording\TestRecorder;
+use function mindplay\testies\enabled;
 use mindplay\testies\Reporting\TestReporter;
 use mindplay\testies\Tester;
 use mindplay\testies\TestRunner;
@@ -18,25 +18,6 @@ class Foo
     }
 }
 
-// TODO move this + the test-case to the mock test-suite
-class MyHelper
-{
-    /**
-     * @var Tester
-     */
-    private $tester;
-
-    public function __construct(Tester $tester)
-    {
-        $this->tester = $tester;
-    }
-
-    public function isWorstCase()
-    {
-        $this->tester->ok(true, "MY TEST");
-    }
-}
-
 // TODO test for code coverage
 
 $suite = new TestSuite("Integration Test");
@@ -44,14 +25,6 @@ $suite = new TestSuite("Integration Test");
 $suite->add(
     "Can measure Test Result",
     function (Tester $is) {
-
-
-        $helper = new MyHelper($is);
-
-        $helper->isWorstCase();
-
-
-
         $suite = new TestSuite("Mock Test");
 
         $runner = new TestRunner();
@@ -89,35 +62,26 @@ $suite->add(
     }
 );
 
-$suite->add(
-    "Can run Test Suite",
-    function (Tester $is) {
-        $suite = new TestSuite("Mock Test");
+$suite->add("Run test-suite and emit Test Report", function (Tester $is) {
+    $suite = new TestSuite("Mock Test");
 
-        $suite->add(
-            "Hello World",
-            require __DIR__ . "/_mock_test.php"
-        );
+    $suite->add(
+        "Hello World",
+        require __DIR__ . "/_mock_test.php"
+    );
 
-        $runner = new TestRunner();
+    $runner = new TestRunner();
 
-        $recorder = new TestRecorder();
+    ob_start();
 
-        $is->eq($runner->run($suite, [$recorder]), false, "the test should fail");
+    $runner->run($suite, [new TestReporter(true)]);
 
-        $is->eq(count($recorder->getSuites()), 1);
+    $output = ob_get_clean();
 
-        $suite = $recorder->getSuites()[0];
+    //file_put_contents(__DIR__ . "/expected-output.txt", $output);
 
-        $is->eq(count($suite->getCases()), 1);
-
-        $case = $suite->getCases()[0];
-
-        $results = $case->getResults();
-
-        $is->eq($results[0]->getResult(), "");
-    }
-);
+    $is->eq($output, file_get_contents(__DIR__ . "/expected-output.txt"));
+});
 
 //test(
 //    "Can run a local test-server",
@@ -135,16 +99,17 @@ $suite->add(
 //    }
 //);
 
-$suite = new TestSuite("Mock Test");
-$suite->add(
-    "Hello World",
-    require __DIR__ . "/_mock_test.php"
-);
 $runner = new TestRunner();
-$runner->run($suite, [new TestReporter(true)]);
-exit; // TODO internally test the output of the mock test-suite
 
+if (enabled("mock-only")) {
+    $suite = new TestSuite("Mock Test");
 
-$runner = new TestRunner();
+    $suite->add(
+        "Hello World",
+        require __DIR__ . "/_mock_test.php"
+    );
+
+    exit($runner->run($suite, [new TestReporter(true)]));
+}
 
 exit($runner->run($suite, [new TestReporter()]) ? 0 : 1); // exits with errorlevel (for CI tools etc.)
