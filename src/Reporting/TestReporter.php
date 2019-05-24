@@ -2,6 +2,10 @@
 
 namespace mindplay\testies\Reporting;
 
+use function addcslashes;
+use function count;
+use function implode;
+use function strlen;
 use TestInterop\AssertionResult;
 use TestInterop\TestCase;
 use TestInterop\TestListener;
@@ -166,13 +170,14 @@ class TestReporter implements TestListener, TestCase
 
         if ($value instanceof Throwable) {
             if ($detailed) {
-                return get_class($value) . ": "
-                    . "\"" . $value->getMessage() . "\""
-                    . "\nin " . $value->getFile() . ":" . $value->getLine()
-                    . "\n" . $value->getTraceAsString();
+                return $this->formatThrowable($value);
             }
 
             return get_class($value);
+        }
+
+        if (is_string($value) && (strpos($value, "\n") === false)) {
+            return "'" . addcslashes($value, "'") . "'";
         }
 
         if (! $detailed && is_array($value)) {
@@ -286,5 +291,60 @@ class TestReporter implements TestListener, TestCase
             array_slice($new, $nmax, $maxlen),
             self::diff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen))
         );
+    }
+
+    private function formatThrowable(Throwable $error): string
+    {
+        $trace = $error->getTrace();
+
+        $formatted = [];
+
+        $indent = 3 + strlen((string) count($trace));
+
+        foreach ($trace as $index => $entry) {
+            $line = array_key_exists("line", $entry)
+                ? $entry["line"]
+                : "";
+
+            $file = isset($entry["file"])
+                ? $entry["file"]
+                : "{internal function}";
+
+            $function = isset($entry["class"])
+                ? $entry["class"] . @$entry["type"] . @$entry["function"]
+                : @$entry["function"];
+
+            if ($function === "require" || $function === "include") {
+                // bypass argument formatting for include and require statements
+                $args = isset($entry["args"]) && is_array($entry["args"])
+                    ? reset($entry["args"])
+                    : "";
+            } else {
+                $args = isset($entry["args"]) && is_array($entry["args"])
+                    ? implode(
+                        ", ",
+                        array_map(
+                            function ($value) {
+                                return $this->format($value, false);
+                            },
+                            $entry["args"]
+                        )
+                    )
+                    : "";
+            }
+
+            $call = $function
+                ? "{$function}({$args})"
+                : "";
+
+            $depth = $index + 1;
+
+            $formatted[] = sprintf("%{$indent}s", "{$depth}.") . " {$file}({$line}): {$call}";
+        }
+
+        return get_class($error) . ": "
+            . "\"" . $error->getMessage() . "\""
+            . "\nin " . $error->getFile() . "(" . $error->getLine() . ")"
+            . "\n" . implode("\n", $formatted);
     }
 }

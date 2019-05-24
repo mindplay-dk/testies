@@ -63,22 +63,11 @@ $suite->add(
 );
 
 $suite->add("Run test-suite and emit Test Report", function (Tester $is) {
-    $suite = new TestSuite("Mock Test");
+    exec("php mock_test.php", $output, $status);
 
-    $suite->add(
-        "Hello World",
-        require __DIR__ . "/_mock_test.php"
-    );
+    $output = implode("\n", $output);
 
-    $runner = new TestRunner();
-
-    ob_start();
-
-    $runner->run($suite, [new TestReporter(true)]);
-
-    $output = ob_get_clean();
-
-    //file_put_contents(__DIR__ . "/expected-output.txt", $output);
+    $is->eq($status, 0);
 
     $is->eq($output, file_get_contents(__DIR__ . "/expected-output.txt"));
 });
@@ -102,14 +91,17 @@ $suite->add("Run test-suite and emit Test Report", function (Tester $is) {
 $runner = new TestRunner();
 
 if (enabled("mock-only")) {
-    $suite = new TestSuite("Mock Test");
+    exec("php mock_test.php", $output, $status);
 
-    $suite->add(
-        "Hello World",
-        require __DIR__ . "/_mock_test.php"
-    );
+    if ($status === 0) {
+        $output = implode("\n", $output);
 
-    exit($runner->run($suite, [new TestReporter(true)]));
+        echo "Updating expected output:\n\n{$output}\n";
+
+        file_put_contents(__DIR__ . "/expected-output.txt", $output);
+    }
+
+    exit($status);
 }
 
 exit($runner->run($suite, [new TestReporter()]) ? 0 : 1); // exits with errorlevel (for CI tools etc.)

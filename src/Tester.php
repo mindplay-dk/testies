@@ -93,13 +93,13 @@ class Tester
             } else {
                 $actual_type = get_class($error);
 
-                $this->ok(false, "$message (expected {$exception_type} but {$actual_type} was thrown)");
+                $this->ok(false, "$message (expected {$exception_type}, but {$actual_type} was thrown)");
             }
 
             return;
         }
 
-        $this->ok(false, "{$message} (expected exception {$exception_type} was NOT thrown)");
+        $this->ok(false, "{$message} (expected {$exception_type}, but no exception was thrown)");
     }
 
     /**

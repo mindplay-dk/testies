@@ -1,6 +1,11 @@
 <?php
 
+use mindplay\testies\Reporting\TestReporter;
 use mindplay\testies\Tester;
+use mindplay\testies\TestRunner;
+use mindplay\testies\TestSuite;
+
+require dirname(__DIR__) . "/vendor/autoload.php";
 
 class WordTester
 {
@@ -25,7 +30,7 @@ class WordTester
     }
 }
 
-return function (Tester $is) {
+$test = function (Tester $is) {
     // Basic assertions:
 
     $is->ok(true);
@@ -114,3 +119,11 @@ return function (Tester $is) {
 
     throw new RuntimeException("THE END");
 };
+
+$suite = new TestSuite("Mock Test");
+
+$suite->add("Hello World", $test);
+
+$runner = new TestRunner();
+
+exit($runner->run($suite, [new TestReporter(true)]));
