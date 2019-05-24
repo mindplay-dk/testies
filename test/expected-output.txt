@@ -1,62 +1,85 @@
 
 === Hello World ===
 
-PASS [test.php#27]
-FAIL [test.php#28]
-PASS [test.php#30] why
-FAIL [test.php#31] why
-PASS [test.php#33] why (string)
-FAIL [test.php#34] why
+PASS mock_test.php:36 ok
+FAIL mock_test.php:37 ok
+PASS mock_test.php:39 why
+FAIL mock_test.php:40 why
+PASS mock_test.php:42 why ('string')
+FAIL mock_test.php:43 why ('string')
+FAIL mock_test.php:45 why
   line 1
   line 2
-PASS [test.php#36] (string)
-PASS [test.php#40]
+FAIL mock_test.php:46 why
+  Array
+  (
+      [0] => 1
+      [1] => 2
+      [2] => 3
+  )
+PASS mock_test.php:50 eq ('string')
+PASS mock_test.php:51 why ('string')
+FAIL mock_test.php:53 eq ('string 1' !== 'string 2')
+FAIL mock_test.php:54 why ('string 1' !== 'string 2')
+PASS mock_test.php:56 eq
   line 1
   line 2
   line 3
-FAIL [test.php#41]
+PASS mock_test.php:57 why
+  line 1
+  line 2
+  line 3
+FAIL mock_test.php:59 eq
 [39m  line 1
-[31m+ line 2
-[39m  line 3
-[32m- line 4
+[31m- line 2
+[31m- line 3
+[39m  line 4
+[32m+ line 5
 [39m
-PASS [test.php#43] why (foo)
-FAIL [test.php#44] why (foo !== bar)
-PASS [test.php#46] (array[3])
-PASS [test.php#47] (TRUE)
-PASS [test.php#48] (FALSE)
-PASS [test.php#49] (Foo)
-PASS [test.php#51] (blip)
-PASS [test.php#53] (blip)
-PASS [test.php#60] why
-  RuntimeException:
-  boom
-PASS [test.php#69] why
-  RuntimeException:
-  booooooom
-FAIL [test.php#78] why (expected RuntimeException message did not match pattern: /bo+m/)
-  RuntimeException:
-  bam
-  
-  Stacktrace:
-  #0 [internal function]: {closure}()
-  #1 /mnt/c/workspace/mindplay-testies/src/test.func.php(137): call_user_func(Object(Closure))
-  #2 /mnt/c/workspace/mindplay-testies/test/test.php(78): mindplay\testies\expect('RuntimeExceptio...', 'why', Object(Closure), '/bo+m/')
-  #3 [internal function]: {closure}()
-  #4 /mnt/c/workspace/mindplay-testies/src/TestDriver.php(153): call_user_func(Object(Closure))
-  #5 /mnt/c/workspace/mindplay-testies/src/test.func.php(54): mindplay\testies\TestDriver->run()
-  #6 /mnt/c/workspace/mindplay-testies/test/test.php(95): mindplay\testies\run()
-  #7 {main}
-FAIL [test.php#86] why (expected exception RuntimeException was NOT thrown)
-FAIL UNEXPECTED EXCEPTION
-  RuntimeException:
-  THE END
-  
-  Stacktrace:
-  #0 [internal function]: {closure}()
-  #1 /mnt/c/workspace/mindplay-testies/src/TestDriver.php(153): call_user_func(Object(Closure))
-  #2 /mnt/c/workspace/mindplay-testies/src/test.func.php(54): mindplay\testies\TestDriver->run()
-  #3 /mnt/c/workspace/mindplay-testies/test/test.php(95): mindplay\testies\run()
-  #4 {main}
-
-* 1 tests completed: 22 assertions, 8 failures
+FAIL mock_test.php:60 why
+[39m  line 1
+[31m- line 2
+[39m  line 3
+[32m+ line 4
+[39m
+FAIL mock_test.php:71 why
+[39m  stdClass Object
+[39m  (
+[39m      [foo] => Array
+[39m          (
+[31m-             [0] => line 1
+[31m- line 2
+[32m+             [0] => line 2
+[32m+ line 3
+[39m          )
+[39m
+[39m      [bar] => Array
+[39m          (
+[39m              [0] => line 1
+[39m  line 2
+[39m          )
+[39m
+[39m  )
+[39m
+[39m
+PASS mock_test.php:78 "this contains test" should contain the word 'test'
+FAIL mock_test.php:80 "this doesn't" should contain the word 'test'
+FAIL mock_test.php:82 dontContainTest
+PASS mock_test.php:91 why (RuntimeException)
+PASS mock_test.php:100 why (RuntimeException)
+FAIL mock_test.php:109 why (message pattern mismatch: /bo+m/)
+  RuntimeException: "bam"
+  in /mnt/c/workspace/mindplay-testies/test/mock_test.php(107)
+    1. {internal function}(): {closure}()
+    2. /mnt/c/workspace/mindplay-testies/src/Tester.php(82): call_user_func({Closure})
+    3. /mnt/c/workspace/mindplay-testies/test/mock_test.php(109): mindplay\testies\Tester->expect('RuntimeException', 'why', {Closure}, '/bo+m/')
+    4. {internal function}(): {closure}({mindplay\testies\Tester})
+    5. /mnt/c/workspace/mindplay-testies/src/TestRunner.php(65): call_user_func({Closure}, {mindplay\testies\Tester})
+    6. /mnt/c/workspace/mindplay-testies/test/mock_test.php(129): mindplay\testies\TestRunner->run({mindplay\testies\TestSuite}, array[1])
+FAIL mock_test.php:117 why (expected RuntimeException, but no exception was thrown)
+ERROR:
+  RuntimeException: "THE END"
+  in /mnt/c/workspace/mindplay-testies/test/mock_test.php(120)
+    1. {internal function}(): {closure}({mindplay\testies\Tester})
+    2. /mnt/c/workspace/mindplay-testies/src/TestRunner.php(65): call_user_func({Closure}, {mindplay\testies\Tester})
+    3. /mnt/c/workspace/mindplay-testies/test/mock_test.php(129): mindplay\testies\TestRunner->run({mindplay\testies\TestSuite}, array[1])
