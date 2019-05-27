@@ -299,15 +299,13 @@ class TestReporter implements TestListener, TestCase
 
         $formatted = [];
 
-        $indent = 3 + strlen((string) count($trace));
-
         foreach ($trace as $index => $entry) {
             $line = array_key_exists("line", $entry)
                 ? $entry["line"]
                 : "";
 
             $file = isset($entry["file"])
-                ? $entry["file"]
+                ? $this->normalizePath($entry["file"])
                 : "{internal function}";
 
             $function = isset($entry["class"])
@@ -339,12 +337,17 @@ class TestReporter implements TestListener, TestCase
 
             $depth = $index + 1;
 
-            $formatted[] = sprintf("%{$indent}s", "{$depth}.") . " {$file}({$line}): {$call}";
+            $formatted[] = sprintf("%4s", "{$depth}.") . " {$file}({$line}): {$call}";
         }
 
         return get_class($error) . ": "
             . "\"" . $error->getMessage() . "\""
-            . "\nin " . $error->getFile() . "(" . $error->getLine() . ")"
+            . "\nin " . $this->normalizePath($error->getFile()) . "(" . $error->getLine() . ")"
             . "\n" . implode("\n", $formatted);
+    }
+
+    private function normalizePath(string $path): string
+    {
+        return strtr($path, "\\", "/");
     }
 }

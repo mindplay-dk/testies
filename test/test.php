@@ -8,17 +8,33 @@ use mindplay\testies\TestSuite;
 
 require dirname(__DIR__) . "/vendor/autoload.php";
 
-class Foo
-{
-    private $bar = "blip";
+// TODO test for code coverage
 
-    protected function blip()
-    {
-        return $this->bar;
+function truncate_paths(string $output): string
+{
+    $cwd = getcwd();
+
+    $dir = $cwd;
+
+    while (! file_exists("{$dir}/composer.json")) {
+        $parent_dir = dirname($dir);
+
+        if ($parent_dir === $dir) {
+            throw new RuntimeException("Unable to locate Composer root from: {$cwd}");
+        }
+
+        $dir = $parent_dir;
     }
+
+    return str_replace($dir, "{root}", $output);
 }
 
-// TODO test for code coverage
+function run_mock_test(): string
+{
+    exec("php " . __DIR__ . "/mock_test.php", $output, $status);
+
+    return "exit code: {$status}\n\n" . truncate_paths(implode("\n", $output));
+}
 
 $suite = new TestSuite("Integration Test");
 
@@ -63,11 +79,7 @@ $suite->add(
 );
 
 $suite->add("Run test-suite and emit Test Report", function (Tester $is) {
-    exec("php mock_test.php", $output, $status);
-
-    $output = implode("\n", $output);
-
-    $is->eq($status, 0);
+    $output = run_mock_test();
 
     $is->eq($output, file_get_contents(__DIR__ . "/expected-output.txt"));
 });
@@ -91,17 +103,13 @@ $suite->add("Run test-suite and emit Test Report", function (Tester $is) {
 $runner = new TestRunner();
 
 if (enabled("mock-only")) {
-    exec("php mock_test.php", $output, $status);
+    $output = run_mock_test();
 
-    if ($status === 0) {
-        $output = implode("\n", $output);
+    echo "Updating expected output:\n\n{$output}\n";
 
-        echo "Updating expected output:\n\n{$output}\n";
+    file_put_contents(__DIR__ . "/expected-output.txt", $output);
 
-        file_put_contents(__DIR__ . "/expected-output.txt", $output);
-    }
-
-    exit($status);
+    exit(0);
 }
 
 exit($runner->run($suite, [new TestReporter()]) ? 0 : 1); // exits with errorlevel (for CI tools etc.)
