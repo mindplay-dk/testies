@@ -34,7 +34,7 @@ $suite->add(
 
         $runner = new TestRunner();
 
-        $is->eq($runner->run($suite, []), true, "an empty Test Suite passes by default");
+        $is->eq($runner->run($suite, []), 0, "an empty Test Suite passes by default");
 
         $suite->add(
             "Successful Case",
@@ -43,7 +43,7 @@ $suite->add(
             }
         );
 
-        $is->eq($runner->run($suite, []), true, "succesful assertions generate a passing test");
+        $is->eq($runner->run($suite, []), 0, "succesful assertions generate a passing test");
 
         $suite->add(
             "Fail Case",
@@ -52,7 +52,7 @@ $suite->add(
             }
         );
 
-        $is->eq($runner->run($suite, []), false, "failed assertions generate a failing test");
+        $is->eq($runner->run($suite, []), 1, "failed assertions generate a failing test");
 
         $bad_suite = new TestSuite("Mock Test");
 
@@ -63,7 +63,7 @@ $suite->add(
             }
         );
 
-        $is->eq($runner->run($bad_suite, []), false, "unexpected error generates a failing test");
+        $is->eq($runner->run($bad_suite, []), 1, "unexpected error generates a failing test");
     }
 );
 
@@ -101,4 +101,4 @@ if (enabled("mock-only")) {
     exit(0);
 }
 
-exit($runner->run($suite, [new TestReporter(enabled("verbose", "v"), enabled("short-paths"))]) ? 0 : 1); // exits with errorlevel (for CI tools etc.)
+exit($runner->run($suite, [new TestReporter(enabled("verbose", "v"), enabled("short-paths"))])); // exits with errorlevel (for CI tools etc.)

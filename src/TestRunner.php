@@ -22,14 +22,19 @@ class TestRunner
     public $throw = false;
 
     /**
+     * Runs a given test-suite with a given array of listeners.
+     *
+     * Returns an `int` error-level value, e.g. `0` for success or `1` for failure,
+     * intended for use with an `exit()` statement.
+     *
      * @param TestSuite      $suite
      * @param TestListener[] $listeners
      *
-     * @return bool true on success, false on failure
+     * @return int error-level (0 for success, 1 for failure.)
      *
      * @throws RuntimeException for unexpected test-failure (only if the `$throw` option is enabled)
      */
-    public function run(TestSuite $suite, array $listeners): bool
+    public function run(TestSuite $suite, array $listeners): int
     {
         // TODO add a built-in listener (maybe?) to check whether the test-suite passed/failed?
 
@@ -93,6 +98,6 @@ class TestRunner
 //            }
 //        }
 
-        return ! $result->hasErrors();
+        return $result->hasErrors() ? 1 : 0;
     }
 }
