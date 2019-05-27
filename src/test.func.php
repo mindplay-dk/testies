@@ -18,6 +18,9 @@ use ReflectionProperty;
  *
  * For example, `if (enabled('skip-slow'))` checks for a `--skip-slow` option.
  *
+ * Test-suites may use this to implement command-line switches - using this to
+ * implement global switches in listeners is not recommended.
+ *
  * @param string $option    option name
  * @param string $shorthand single-letter shorthand (optional)
  *
