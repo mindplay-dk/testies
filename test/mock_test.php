@@ -126,4 +126,4 @@ $suite->add("Hello World", $test);
 
 $runner = new TestRunner();
 
-exit($runner->run($suite, [new TestReporter(true)]));
+exit($runner->run($suite, [new TestReporter(true, true)]));

@@ -5,6 +5,7 @@ namespace mindplay\testies\Reporting;
 use function addcslashes;
 use function count;
 use function implode;
+use RuntimeException;
 use function strlen;
 use TestInterop\AssertionResult;
 use TestInterop\TestCase;
@@ -33,6 +34,16 @@ class TestReporter implements TestListener, TestCase
     private $verbose;
 
     /**
+     * @var bool
+     */
+    private $short_paths;
+
+    /**
+     * @var string|null
+     */
+    private $base_path = null;
+
+    /**
      * @var int
      */
     private $current_test = 0;
@@ -48,13 +59,31 @@ class TestReporter implements TestListener, TestCase
     private $current_test_name;
 
     /**
-     * @param bool|null $verbose
+     * @param bool $verbose     enables verbose output (details of all assertions, even successful ones)
+     * @param bool $short_paths truncates file-system paths in output (more readable, less machine-friendly)
      */
-    public function __construct(?bool $verbose = null)
+    public function __construct(bool $verbose = false, bool $short_paths = false)
     {
-        $this->verbose = is_bool($verbose)
-            ? $verbose
-            : enabled("verbose", "v");
+        $this->verbose = $verbose;
+        $this->short_paths = $short_paths;
+
+        if ($short_paths) {
+            $cwd = getcwd();
+
+            $dir = $cwd;
+
+            while (! file_exists("{$dir}/composer.json")) {
+                $parent_dir = dirname($dir);
+
+                if ($parent_dir === $dir) {
+                    throw new RuntimeException("Unable to locate Composer root from: {$cwd}");
+                }
+
+                $dir = $parent_dir;
+            }
+
+            $this->base_path = $this->normalizePath($dir) . "/";
+        }
     }
 
     public function beginTestSuite(string $name, array $properties = []): void
@@ -121,9 +150,19 @@ class TestReporter implements TestListener, TestCase
             }
         }
 
-        $trace = $result->getFile()
-            ? " " . basename($result->getFile()) . ":" . $result->getLine()
-            : "";
+        $path = $result->getFile();
+
+        $trace = "";
+
+        if ($path) {
+            $path = $this->short_paths
+                ? basename($path)
+                : $this->normalizePath($path);
+
+            $line = $result->getLine();
+
+            $trace = " {$path}({$line})";
+        }
 
         $message = $result->getMessage() ?: $result->getType();
 
@@ -293,6 +332,13 @@ class TestReporter implements TestListener, TestCase
         );
     }
 
+    /**
+     * Render a human-readable error message and stack-trace.
+     *
+     * @param Throwable $error
+     *
+     * @return string
+     */
     private function formatThrowable(Throwable $error): string
     {
         $trace = $error->getTrace();
@@ -305,7 +351,7 @@ class TestReporter implements TestListener, TestCase
                 : "";
 
             $file = isset($entry["file"])
-                ? $this->normalizePath($entry["file"])
+                ? $this->truncatePath($this->normalizePath($entry["file"]))
                 : "{internal function}";
 
             $function = isset($entry["class"])
@@ -342,12 +388,39 @@ class TestReporter implements TestListener, TestCase
 
         return get_class($error) . ": "
             . "\"" . $error->getMessage() . "\""
-            . "\nin " . $this->normalizePath($error->getFile()) . "(" . $error->getLine() . ")"
+            . "\nin " . $this->truncatePath($this->normalizePath($error->getFile())) . "(" . $error->getLine() . ")"
             . "\n" . implode("\n", $formatted);
     }
 
+    /**
+     * Normalizes backslashes (on Windows) to forward slashes for more consistent output.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
     private function normalizePath(string $path): string
     {
         return strtr($path, "\\", "/");
+    }
+
+    /**
+     * Truncates file-system paths, if enabled - otherwise, the path is returned as-is.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    private function truncatePath(string $path): string
+    {
+        if ($this->base_path !== null) {
+            $offset = strpos($path, $this->base_path);
+
+            if ($offset === 0) {
+                return "{root}/" . substr($path, strlen($this->base_path));
+            }
+        }
+
+        return $path;
     }
 }

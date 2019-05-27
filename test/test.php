@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Command line switches for this test-suite:
+ *
+ *   --mock-only    updates the "expected-output.txt" file
+ *   --verbose      output all assertions (even successful ones)
+ *   --short-paths  truncates file-system paths in output (more readable, less machine-friendly)
+ */
+
 use function mindplay\testies\enabled;
 use mindplay\testies\Reporting\TestReporter;
 use mindplay\testies\Tester;
@@ -10,30 +18,11 @@ require dirname(__DIR__) . "/vendor/autoload.php";
 
 // TODO test for code coverage
 
-function truncate_paths(string $output): string
-{
-    $cwd = getcwd();
-
-    $dir = $cwd;
-
-    while (! file_exists("{$dir}/composer.json")) {
-        $parent_dir = dirname($dir);
-
-        if ($parent_dir === $dir) {
-            throw new RuntimeException("Unable to locate Composer root from: {$cwd}");
-        }
-
-        $dir = $parent_dir;
-    }
-
-    return str_replace($dir, "{root}", $output);
-}
-
 function run_mock_test(): string
 {
     exec("php " . __DIR__ . "/mock_test.php", $output, $status);
 
-    return "exit code: {$status}\n\n" . truncate_paths(implode("\n", $output));
+    return "exit code: {$status}\n\n" . implode("\n", $output);
 }
 
 $suite = new TestSuite("Integration Test");
@@ -112,4 +101,4 @@ if (enabled("mock-only")) {
     exit(0);
 }
 
-exit($runner->run($suite, [new TestReporter()]) ? 0 : 1); // exits with errorlevel (for CI tools etc.)
+exit($runner->run($suite, [new TestReporter(enabled("verbose", "v"), enabled("short-paths"))]) ? 0 : 1); // exits with errorlevel (for CI tools etc.)
