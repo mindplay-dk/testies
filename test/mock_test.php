@@ -2,6 +2,7 @@
 
 use mindplay\testies\Reporting\TestReporter;
 use mindplay\testies\Tester;
+use mindplay\testies\TestResult;
 use mindplay\testies\TestRunner;
 use mindplay\testies\TestSuite;
 
@@ -10,27 +11,27 @@ require dirname(__DIR__) . "/vendor/autoload.php";
 class WordTester
 {
     /**
-     * @var Tester
+     * @var TestResult
      */
-    private $tester;
+    private $result;
 
-    public function __construct(Tester $tester)
+    public function __construct(TestResult $result)
     {
-        $this->tester = $tester;
+        $this->result = $result;
     }
 
     public function containTest(string $str)
     {
-        $this->tester->addResult(\stripos($str, "test") !== false, __FUNCTION__, [], "\"{$str}\" should contain the word 'test'");
+        $this->result->add(stripos($str, "test") !== false, __FUNCTION__, [], "\"{$str}\" should contain the word 'test'");
     }
 
     public function dontContainTest(string $str)
     {
-        $this->tester->addResult(\stripos($str, "test") === false, __FUNCTION__);
+        $this->result->add(stripos($str, "test") === false, __FUNCTION__);
     }
 }
 
-$test = function (Tester $is) {
+$test = function (Tester $is, TestResult $result) {
     // Basic assertions:
 
     $is->ok(true);
@@ -73,7 +74,7 @@ $test = function (Tester $is) {
 
     // Custom assertions:
 
-    $words = new WordTester($is);
+    $words = new WordTester($result);
 
     $words->containTest("this contains test");
 

@@ -2,42 +2,22 @@
 
 namespace mindplay\testies;
 
-use ReflectionFunction;
-use TestInterop\Common\AssertionResult;
-use TestInterop\TestCase;
 use Throwable;
-use function debug_backtrace;
 use function func_num_args;
 
-// TODO QA: I'm going with this design for now, but will review when it's done.
-//          It kinda seems like this class has two responsibilities...
-//          addResult() and trace() could possibly move to a separate component,
-//          enabling tests (and test-facilities) to implement custom assertions.
-
-// TODO the term "message" seems arbitrary; perhaps "reason" would make more sense?
-//      consider changing the terminology here and in the test-interop package
-
-// TODO consider changing the terminology from $value and $expected to
-//      $actual and $expected - and in the test-interop package, consider qualifying
-//      the accessors as e.g. getActualValue() and getExpectedValue() etc. to clarify
-//      the fact that these values are related.
-
+/**
+ * This class implements basic assertions.
+ */
 class Tester
 {
     /**
-     * @var Test
+     * @var TestResult
      */
-    private $test;
+    private $result;
 
-    /**
-     * @var TestCase
-     */
-    private $case;
-
-    public function __construct(Test $test, TestCase $case)
+    public function __construct(TestResult $result)
     {
-        $this->test = $test;
-        $this->case = $case;
+        $this->result = $result;
     }
 
     /**
@@ -50,9 +30,9 @@ class Tester
     public function ok(bool $result, ?string $message = null, $value = null): void
     {
         if (func_num_args() === 3) {
-            $this->addResult($result, __FUNCTION__, [], $message, $value);
+            $this->result->add($result, __FUNCTION__, [], $message, $value);
         } else {
-            $this->addResult($result, __FUNCTION__, [], $message);
+            $this->result->add($result, __FUNCTION__, [], $message);
         }
     }
 
@@ -65,7 +45,7 @@ class Tester
      */
     public function eq($value, $expected, ?string $message = null): void
     {
-        $this->addResult($value === $expected, __FUNCTION__, [], $message, $value, $expected);
+        $this->result->add($value === $expected, __FUNCTION__, [], $message, $value, $expected);
     }
 
     /**
@@ -84,12 +64,13 @@ class Tester
             if ($error instanceof $exception_type) {
                 foreach ((array) $patterns as $pattern) {
                     if (preg_match($pattern, $error->getMessage()) !== 1) {
-                        $this->addResult(false, __FUNCTION__, [], "$message (message pattern mismatch: {$pattern})", $error);
+                        $this->result->add(false, __FUNCTION__, [], "$message (message pattern mismatch: {$pattern})", $error);
+
                         return;
                     }
                 }
 
-                $this->addResult(true, __FUNCTION__, [], $message, $error);
+                $this->result->add(true, __FUNCTION__, [], $message, $error);
             } else {
                 $actual_type = get_class($error);
 
@@ -100,76 +81,5 @@ class Tester
         }
 
         $this->ok(false, "{$message} (expected {$exception_type}, but no exception was thrown)");
-    }
-
-    /**
-     * Add an Assertion Result to the Test Case.
-     *
-     * Note that this function is overloaded: passing a null $value or $expected argument
-     * is *not* the same as calling the function without these arguments.
-     *
-     * @param bool        $result   result of assertion (must === TRUE)
-     * @param string      $type     required assertion type (often just the assertion method-name)
-     * @param array       $context  additional kay/value map of context values pertaining to the assertion
-     * @param string|null $message  optional message describing the reason or expected outcome, etc.
-     * @param mixed       $value    actual value (optional)
-     * @param mixed       $expected expected value (optional)
-     */
-    public function addResult(bool $result, string $type, array $context = [], ?string $message = null, $value = null, $expected = null)
-    {
-        $result = new AssertionResult($result, $type);
-
-        $file = null;
-        $line = null;
-
-        [$file, $line] = $this->trace();
-
-        if ($file !== null) {
-            $result->setFile($file);
-            $result->setLine($line);
-        }
-
-        $result->addContext($context);
-
-        $result->setMessage($message);
-
-        if (func_num_args() >= 5) {
-            $result->setValue($value);
-        }
-
-        if (func_num_args() >= 6) {
-            $result->setExpected($expected);
-        }
-
-        $this->case->addResult($result);
-    }
-
-    /**
-     * Obtain a filename and line number to the call that was made in the Test function.
-     *
-     * @return array where: [string $file, int $line]
-     */
-    private function trace(): array
-    {
-        $frames = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
-
-        $test_file = (new ReflectionFunction($this->test->getFunction()))->getFileName();
-
-        for ($i = count($frames); $i--;) {
-            $frame = $frames[$i];
-
-            if (@$frame["class"] === TestRunner::class) {
-                continue;
-            }
-
-            if (@$frame["file"] === $test_file) {
-                $file = @$frame["file"];
-                $line = @$frame["line"];
-
-                break;
-            }
-        }
-
-        return [$file, $line];
     }
 }

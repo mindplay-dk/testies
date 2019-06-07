@@ -8,13 +8,11 @@ use function implode;
 use RuntimeException;
 use function strlen;
 use TestInterop\AssertionResult;
-use TestInterop\TestCase;
 use TestInterop\TestListener;
 use Throwable;
 use function basename;
 use function explode;
 use function get_class;
-use function mindplay\testies\enabled;
 use function print_r;
 use function strpos;
 use function trim;
@@ -22,7 +20,7 @@ use function trim;
 /**
  * This listener prints a report of test-results to console.
  */
-class TestReporter implements TestListener, TestCase
+class TestReporter implements TestListener
 {
     const COLOR_RED = "\033[31m";
     const COLOR_GREEN = "\033[32m";
@@ -56,7 +54,7 @@ class TestReporter implements TestListener, TestCase
     /**
      * @var string|null
      */
-    private $current_test_name;
+    private $current_test_title;
 
     /**
      * @param bool $verbose     enables verbose output (details of all assertions, even successful ones)
@@ -91,23 +89,11 @@ class TestReporter implements TestListener, TestCase
         // TODO: Implement beginTestSuite() method.
     }
 
-    public function endTestSuite(): void
+    public function beginTestCase(string $name, ?string $source = null): void
     {
-        // TODO $this->printSummary();
-    }
-
-    public function beginTestCase(string $name, ?string $className = null): TestCase
-    {
-        $this->current_test_name = $name;
+        $this->current_test_title = $name;
 
         $this->current_test++;
-
-        return $this;
-    }
-
-    public function endTestCase(): void
-    {
-        $this->current_test_name = null;
     }
 
     public function addResult(AssertionResult $result): void
@@ -117,7 +103,7 @@ class TestReporter implements TestListener, TestCase
         }
 
         if ($this->last_test !== $this->current_test) {
-            $this->printTitle($this->current_test_name);
+            $this->printTitle($this->current_test_title);
 
             $this->last_test = $this->current_test;
         }
@@ -173,7 +159,7 @@ class TestReporter implements TestListener, TestCase
         echo ($result->getResult() === true ? "PASS" : "FAIL") . $trace . $message . $output . "\n";
     }
 
-    public function addError(Throwable $error): void
+    public function setError(Throwable $error): void
     {
         echo "ERROR:\n" . $this->indent($this->format($error, true)) . "\n";
     }
@@ -181,6 +167,16 @@ class TestReporter implements TestListener, TestCase
     public function setSkipped(string $reason): void
     {
         echo "SKIPPED: {$reason}\n";
+    }
+
+    public function endTestCase(): void
+    {
+        $this->current_test_title = null;
+    }
+
+    public function endTestSuite(): void
+    {
+        // TODO $this->printSummary();
     }
 
     /**

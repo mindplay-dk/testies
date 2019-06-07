@@ -3,8 +3,8 @@
 namespace mindplay\testies;
 
 use ErrorException;
+use ReflectionFunction;
 use RuntimeException;
-use TestInterop\Common\CompositeTestCase;
 use TestInterop\Common\CompositeTestListener;
 use TestInterop\TestListener;
 use Throwable;
@@ -52,29 +52,39 @@ class TestRunner
 
         $listener->beginTestSuite($suite->getName(), $suite->getProperties());
 
-        $result = new TestResult();
+        $status = 0;
 
         foreach ($suite->getTests() as $test) {
-            $case = new CompositeTestCase([
-                $result,
-                $listener->beginTestCase($test->getName())
-            ]);
+            $result = new TestResult($test, $listener);
 
-            $tester = new Tester($test, $case);
+            $reflection = new ReflectionFunction($test->getFunction());
+
+            $source = $reflection->getFileName()
+                . "(" . $reflection->getStartLine()
+                . ".." . $reflection->getEndLine()
+                . ")";
+
+            $listener->beginTestCase($test->getName(), $source);
 
             try {
                 // TODO setup?
 
                 // TODO factory abstractions?
-                // TODO dependency injection
-                call_user_func($test->getFunction(), $tester);
+                // TODO dependency injection!
+                call_user_func($test->getFunction(), new Tester($result), $result);
 
                 // TODO teardown?
             } catch (Throwable $error) {
-                $case->addError($error);
+                $listener->setError($error);
+
+                $status = 1;
             }
 
             $listener->endTestCase();
+
+            if ($result->hasErrors()) {
+                $status = 1;
+            }
 
             if (isset($error) && $this->throw) {
                 throw new RuntimeException("Exception while running test: {$test->getName()}", 0, $error);
@@ -87,6 +97,8 @@ class TestRunner
             restore_error_handler();
         }
 
+        return $status;
+
         // TODO move to coverage listener
 //        if ($this->coverage) {
 //            $this->printCodeCoverageResult($this->coverage);
@@ -97,7 +109,5 @@ class TestRunner
 //                echo "\n* code coverage report created: {$this->coverage_output_path}\n";
 //            }
 //        }
-
-        return $result->hasErrors() ? 1 : 0;
     }
 }

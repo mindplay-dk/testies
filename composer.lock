@@ -1,23 +1,23 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "396bdf15044005efb9fb28d072b8831c",
+    "content-hash": "b7217d7f743504ce160547e1670832eb",
     "packages": [
         {
             "name": "test-interop/test-listener",
-            "version": "dev-flat-listener",
+            "version": "dev-single-listener",
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/mindplaydk/test-interop.git",
-                "reference": "dbf6fc3e3f8e346bc2f797c37b7fbb2651a12232"
+                "reference": "08bd8aec09999380bf0ab046c520e66ee88d3f46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/mindplaydk/test-interop/get/dbf6fc3e3f8e346bc2f797c37b7fbb2651a12232.zip",
-                "reference": "dbf6fc3e3f8e346bc2f797c37b7fbb2651a12232",
+                "url": "https://bitbucket.org/mindplaydk/test-interop/get/08bd8aec09999380bf0ab046c520e66ee88d3f46.zip",
+                "reference": "08bd8aec09999380bf0ab046c520e66ee88d3f46",
                 "shasum": ""
             },
             "require": {
@@ -29,16 +29,21 @@
                     "TestInterop\\": "src/"
                 }
             },
+            "autoload-dev": {
+                "psr-4": {
+                    "TestInterop\\Test\\": "test/src/"
+                }
+            },
             "license": [
                 "MIT"
             ],
             "description": "Interoperability model for streaming test-listeners",
             "homepage": "https://bitbucket.org/mindplaydk/test-interop",
             "support": {
-                "source": "https://bitbucket.org/mindplaydk/test-interop/src/dbf6fc3e3f8e346bc2f797c37b7fbb2651a12232/?at=flat-listener",
+                "source": "https://bitbucket.org/mindplaydk/test-interop/src/08bd8aec09999380bf0ab046c520e66ee88d3f46/?at=single-listener",
                 "issues": "https://bitbucket.org/mindplaydk/test-interop/issues"
             },
-            "time": "2019-01-02T17:59:43+00:00"
+            "time": "2019-06-07T09:16:41+00:00"
         }
     ],
     "packages-dev": [

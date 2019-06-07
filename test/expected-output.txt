@@ -3,48 +3,48 @@ exit code: 1
 
 === Hello World ===
 
-PASS mock_test.php(36) ok
-FAIL mock_test.php(37) ok
-PASS mock_test.php(39) why
-FAIL mock_test.php(40) why
-PASS mock_test.php(42) why ('string')
-FAIL mock_test.php(43) why ('string')
-FAIL mock_test.php(45) why
+PASS mock_test.php(37) ok
+FAIL mock_test.php(38) ok
+PASS mock_test.php(40) why
+FAIL mock_test.php(41) why
+PASS mock_test.php(43) why ('string')
+FAIL mock_test.php(44) why ('string')
+FAIL mock_test.php(46) why
   line 1
   line 2
-FAIL mock_test.php(46) why
+FAIL mock_test.php(47) why
   Array
   (
       [0] => 1
       [1] => 2
       [2] => 3
   )
-PASS mock_test.php(50) eq ('string')
-PASS mock_test.php(51) why ('string')
-FAIL mock_test.php(53) eq ('string 1' !== 'string 2')
-FAIL mock_test.php(54) why ('string 1' !== 'string 2')
-PASS mock_test.php(56) eq
+PASS mock_test.php(51) eq ('string')
+PASS mock_test.php(52) why ('string')
+FAIL mock_test.php(54) eq ('string 1' !== 'string 2')
+FAIL mock_test.php(55) why ('string 1' !== 'string 2')
+PASS mock_test.php(57) eq
   line 1
   line 2
   line 3
-PASS mock_test.php(57) why
+PASS mock_test.php(58) why
   line 1
   line 2
   line 3
-FAIL mock_test.php(59) eq
+FAIL mock_test.php(60) eq
 [39m  line 1
 [31m- line 2
 [31m- line 3
 [39m  line 4
 [32m+ line 5
 [39m
-FAIL mock_test.php(60) why
+FAIL mock_test.php(61) why
 [39m  line 1
 [31m- line 2
 [39m  line 3
 [32m+ line 4
 [39m
-FAIL mock_test.php(71) why
+FAIL mock_test.php(72) why
 [39m  stdClass Object
 [39m  (
 [39m      [foo] => Array
@@ -64,24 +64,24 @@ FAIL mock_test.php(71) why
 [39m  )
 [39m
 [39m
-PASS mock_test.php(78) "this contains test" should contain the word 'test'
-FAIL mock_test.php(80) "this doesn't" should contain the word 'test'
-FAIL mock_test.php(82) dontContainTest
-PASS mock_test.php(91) why (RuntimeException)
-PASS mock_test.php(100) why (RuntimeException)
-FAIL mock_test.php(109) why (message pattern mismatch: /bo+m/)
+PASS mock_test.php(79) "this contains test" should contain the word 'test'
+FAIL mock_test.php(81) "this doesn't" should contain the word 'test'
+FAIL mock_test.php(83) dontContainTest
+PASS mock_test.php(92) why (RuntimeException)
+PASS mock_test.php(101) why (RuntimeException)
+FAIL mock_test.php(110) why (message pattern mismatch: /bo+m/)
   RuntimeException: "bam"
-  in {root}/test/mock_test.php(107)
+  in {root}/test/mock_test.php(108)
     1. {internal function}(): {closure}()
-    2. {root}/src/Tester.php(82): call_user_func({Closure})
-    3. {root}/test/mock_test.php(109): mindplay\testies\Tester->expect('RuntimeException', 'why', {Closure}, '/bo+m/')
-    4. {internal function}(): {closure}({mindplay\testies\Tester})
-    5. {root}/src/TestRunner.php(70): call_user_func({Closure}, {mindplay\testies\Tester})
-    6. {root}/test/mock_test.php(129): mindplay\testies\TestRunner->run({mindplay\testies\TestSuite}, array[1])
-FAIL mock_test.php(117) why (expected RuntimeException, but no exception was thrown)
+    2. {root}/src/Tester.php(62): call_user_func({Closure})
+    3. {root}/test/mock_test.php(110): mindplay\testies\Tester->expect('RuntimeException', 'why', {Closure}, '/bo+m/')
+    4. {internal function}(): {closure}({mindplay\testies\Tester}, {mindplay\testies\TestResult})
+    5. {root}/src/TestRunner.php(74): call_user_func({Closure}, {mindplay\testies\Tester}, {mindplay\testies\TestResult})
+    6. {root}/test/mock_test.php(130): mindplay\testies\TestRunner->run({mindplay\testies\TestSuite}, array[1])
+FAIL mock_test.php(118) why (expected RuntimeException, but no exception was thrown)
 ERROR:
   RuntimeException: "THE END"
-  in {root}/test/mock_test.php(120)
-    1. {internal function}(): {closure}({mindplay\testies\Tester})
-    2. {root}/src/TestRunner.php(70): call_user_func({Closure}, {mindplay\testies\Tester})
-    3. {root}/test/mock_test.php(129): mindplay\testies\TestRunner->run({mindplay\testies\TestSuite}, array[1])
+  in {root}/test/mock_test.php(121)
+    1. {internal function}(): {closure}({mindplay\testies\Tester}, {mindplay\testies\TestResult})
+    2. {root}/src/TestRunner.php(74): call_user_func({Closure}, {mindplay\testies\Tester}, {mindplay\testies\TestResult})
+    3. {root}/test/mock_test.php(130): mindplay\testies\TestRunner->run({mindplay\testies\TestSuite}, array[1])
