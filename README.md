@@ -9,8 +9,7 @@ Tries to honor the [Go language philosophy of testing](http://golang.org/doc/faq
 > mechanisms, but PHP already has all those capabilities; why recreate them? We'd rather write tests in PHP; it's one
 > fewer language to learn and the approach keeps the tests straightforward and easy to understand.
 
-The primary test API is procedural-style global functions - you're cool with that, because you don't
-have anything else is the global namespace, right?
+The primary test API is procedural-style functions in the `test` namespace.
 
 Internally, the procedural API is backed by a pair of simple driver and configuration classes - these are left
 as open as possible, and you should feel comfortable extending these and tailoring them specifically to suit the
@@ -25,10 +24,18 @@ Install via Composer:
 
 Then create a test script - the format is pretty simple:
 
-```PHP
+```php
 <?php
 
+// import the functions you need:
+
+use function mindplay\testies\{test, ok};
+
+// bootstrap Composer:
+
 require dirname(__DIR__) . '/vendor/autoload.php';
+
+// define your tests:
 
 test(
     'Describe your test here',
@@ -37,17 +44,19 @@ test(
     }
 );
 
+// run your tests:
+
 exit(run()); // exits with errorlevel (for CI tools etc.)
 ```
 
-You will call `test()` as many times as you need to - the tests will queue up, and execute when you call `run()`.
+You can call `test()` as many times as you need to - the tests will queue up, and execute when you call `run()`.
 
 
 ### Procedural API
 
-Basic API overview:
+The following functions are available in the `mindplay\testies` namespace:
 
-```PHP
+```php
 # Assertions:
 
 ok($result, $why, $value);                 # check the result on an expression
@@ -64,7 +73,7 @@ format($value, $detailed = false);         # format a value for use in diagnosti
 Rather than providing hundreds of assertion functions, you perform assertions using PHP expressions,
 often in concert with helper, and built-in standard functions in PHP - some examples:
 
-```PHP
+```php
 test(
     'Various things of great importance',
     function () {
@@ -88,7 +97,7 @@ ordinary everyday code.
 Your custom assertion functions, like the built-in assertion functions, are just functions - usually
 these will call back to the `ok()` function to report the result. For example:
 
-```PHP
+```php
 /**
  * Assert that a numeric value is very close to a given expected value 
  * 
@@ -112,7 +121,7 @@ test(
 
 You can use the same approach to group multiple assertions:
 
-```PHP
+```php
 function checkValue($value) {
     ok(is_int($value), "value should be numeric", $value);
     ok($value > 0, "value should be positive", $value);
@@ -142,7 +151,7 @@ For test scenarios where the code needs to run out-of-process (such as [mockery]
 or if you need to check the response from a script (e.g. using [guzzle](https://packagist.org/packages/guzzlehttp/guzzle)),
 we provide a simple wrapper class to launch and shut down a server:
 
-```PHP
+```php
 use GuzzleHttp\Client;
 
 $server = new TestServer(__DIR__, 8088);
@@ -179,19 +188,19 @@ to the current instance of `TestConfiguration`.
 
 To enable code coverage and display the summary result on the console:
 
-```PHP
+```php
 configure()->enableCodeCoverage();
 ```
 
 To output a `clover.xml` file for integration with external analysis tools, specify an output path:
 
-```PHP
+```php
 configure()->enableCodeCoverage(__DIR__ . '/build/clover.xml');
 ```
 
 To enable code coverage analysis only for files in certain folders, pass a path (or array of paths) like so:
 
-```PHP
+```php
 configure()->enableCodeCoverage(__DIR__ . '/build/clover.xml', dirname(__DIR__) . '/src');
 ```
 
@@ -201,9 +210,11 @@ configure()->enableCodeCoverage(__DIR__ . '/build/clover.xml', dirname(__DIR__) 
 By default, test output does not produce messages about successful assertions, only failures - if you
 want more stuff to look at, enable verbose output:
 
-```PHP
+```php
 configure()->enableVerboseOutput();
 ```
+
+You can also enable this from the command line with the `-v` or `--verbose` switch.
 
 
 ### Strict Error Handling
@@ -211,7 +222,7 @@ configure()->enableVerboseOutput();
 By default, all PHP errors/warnings/notices are automatically mapped to exceptions via a simple
 built-in error handler. If you're testing something that has custom error handling, you can disable it with:
 
-```PHP
+```php
 configure()->disableErrorHandler();
 ```
 
@@ -225,7 +236,7 @@ how special objects are formatted for output on the console.
 
 To use a custom, derived `TestConfiguration` class:
 
-```PHP
+```php
 // Derive your custom configuration class:
 
 class MyTestConfiguration extends TestConfiguration
@@ -242,7 +253,7 @@ Then proceed with business as usual.
 
 To use a custom, derived `TestDriver` class: 
 
-```PHP
+```php
 // Derive your custom driver class:
 
 class MyTestDriver extends TestDriver
@@ -257,7 +268,7 @@ configure(new TestConfiguration(new TestDriver));
 
 Alternatively, create a configuration class that provides a custom default driver class:
 
-```PHP
+```php
 class MyTestDriver extends TestDriver
 {
     // ...

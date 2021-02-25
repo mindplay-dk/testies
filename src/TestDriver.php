@@ -2,20 +2,18 @@
 
 namespace mindplay\testies;
 
-use Error;
-use PHP_CodeCoverage;
-use PHP_CodeCoverage_Report_Text;
-use PHP_CodeCoverage_Report_Clover;
-
-use Exception;
-use ErrorException;
 use Closure;
+use Error;
+use ErrorException;
+use Exception;
 use RuntimeException;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Report;
 
 /**
  * This class implements the default driver for testing.
  *
- * You can override the default test driver with an extended driver via {@link configure()}.
+ * You can override the default test driver with an extended driver via {@see configure()}.
  *
  * To access the driver (e.g. from custom assertion functions) use `configure()->driver->...`
  */
@@ -32,7 +30,7 @@ class TestDriver
     public $strict = true;
 
     /**
-     * @var PHP_CodeCoverage|null active code coverage instance (or NULL if inactive)
+     * @var CodeCoverage|null active code coverage instance (or NULL if inactive)
      */
     public $coverage;
 
@@ -49,7 +47,7 @@ class TestDriver
     /**
      * @var Closure[] map where test title => test function
      */
-    protected $tests = array();
+    protected $tests = [];
 
     /**
      * @var int total number of assertions performed
@@ -67,9 +65,9 @@ class TestDriver
     protected $current_test;
 
     /**
-     * @var string title of the test that last generated output
+     * @var string title of the last test that generated output
      */
-    protected $last_output;
+    protected $last_test;
 
     /**
      * @var Closure
@@ -121,12 +119,12 @@ class TestDriver
      *
      * @return bool true if all tests succeed; otherwise false
      */
-    public function run()
+    public function run(): bool
     {
         $this->assertions = 0;
         $this->failures = 0;
         $this->current_test = null;
-        $this->last_output = null;
+        $this->last_test = null;
 
         if ($this->strict) {
             set_error_handler(function ($errno, $errstr, $errfile, $errline) {
@@ -204,21 +202,22 @@ class TestDriver
      *
      * @return void
      */
-    public function printTitle($title)
+    public function printTitle(string $title)
     {
         echo "\n=== $title ===\n\n";
     }
 
     /**
-     * Check and report the result of an expression.
+     * Check and report the result of an assertion.
      *
-     * @param bool   $result result of assertion (must === TRUE)
-     * @param string $why    description of assertion
-     * @param mixed  $value  optional value (displays on failure)
+     * @param bool        $result   result of assertion (must === TRUE)
+     * @param string|null $why      optional description of assertion
+     * @param mixed       $value    optional actual value (displays on failure)
+     * @param mixed       $expected optional expected value (displays on failure)
      *
      * @return void
      */
-    public function printResult($result, $why = null, $value = null)
+    public function printResult(bool $result, ?string $why = null, $value = null, $expected = null)
     {
         $this->assertions += 1;
 
@@ -227,36 +226,49 @@ class TestDriver
         }
 
         if ($this->verbose === false && $result === true) {
-            return; // be quiet.
+            return; // quite successful assertion
         }
 
-        if ($this->last_output !== $this->current_test) {
+        if ($this->last_test !== $this->current_test) {
             $this->printTitle($this->current_test);
 
-            $this->last_output = $this->current_test;
+            $this->last_test = $this->current_test;
         }
 
         $trace = $this->trace();
 
-        if ($trace) {
-            $trace = "[{$trace}] ";
-        }
+        $detailed = $result === false;
 
-        $formatted = '';
+        $formatted_value = $this->format($value, $detailed);
 
-        if ($value !== null) {
-            $formatted = $this->format($value, $result === false);
+        $show_diff = $value !== $expected && func_num_args() === 4;
 
-            $formatted = strpos($formatted, "\n") === false
-                ? "({$formatted})"
-                : "-> {$formatted}";
-        }
+        if ($show_diff) {
+            $formatted_expected = $this->format($expected, $detailed);
 
-        if ($result === true) {
-            echo "- PASS: {$trace}" . ($why ?: 'OK') . " {$formatted}\n";
+            $multiline = strpos($formatted_value . $formatted_expected, "\n") !== false;
+
+            if ($multiline) {
+                $output = "\n" . trim($this->formatDiff($formatted_value, $formatted_expected), "\r\n");
+            } else {
+                $output = " ({$formatted_value} !== {$formatted_expected})";
+            }
         } else {
-            echo "# FAIL: {$trace}" . ($why ?: 'ERROR') . " {$formatted}\n";
+            $multiline = strpos($formatted_value, "\n") !== false;
+
+            if ($multiline) {
+                $output = "\n" . trim($this->indent($formatted_value), "\r\n");
+            } else {
+                $output = $value === null
+                    ? "" // don't display null when there's no difference from the expected value
+                    : " ({$formatted_value})";
+            }
         }
+
+        echo ($result === true ? "PASS" : "FAIL")
+            . ($trace ? " [{$trace}]" : "")
+            . ($why ? " {$why}" : "")
+            . $output . "\n";
     }
 
     /**
@@ -277,15 +289,19 @@ class TestDriver
      *
      * @return string formatted value
      */
-    public function format($value, $detailed = false)
+    public function format($value, bool $detailed = false): string
     {
         if ($value instanceof Exception || $value instanceof Error) {
-            return $detailed
-                ? get_class($value) . ": \n\"" . $value->getMessage() . "\"\n\nStacktrace:\n" . $value->getTraceAsString()
-                : get_class($value) . ": \n\"" . $value->getMessage() . "\"";
+            $details = $value->getMessage();
+
+            if ($detailed) {
+                $details .= "\n\nStacktrace:\n" . $value->getTraceAsString();
+            }
+
+            return get_class($value) . ":\n{$details}";
         }
 
-        if (!$detailed && is_array($value)) {
+        if (! $detailed && is_array($value)) {
             return 'array[' . count($value) . ']';
         }
 
@@ -293,7 +309,7 @@ class TestDriver
             return $value ? 'TRUE' : 'FALSE';
         }
 
-        if (is_object($value) && !$detailed) {
+        if (is_object($value) && ! $detailed) {
             return get_class($value);
         }
 
@@ -301,11 +317,23 @@ class TestDriver
     }
 
     /**
+     * Indents multi-line text for display.
+     *
+     * @param string $str
+     *
+     * @return string
+     */
+    public function indent(string $str): string
+    {
+        return "  " . implode("\n  ", explode("\n", trim($str))) . "\n";
+    }
+
+    /**
      * Obtain a filename and line number index of a call made in a test-closure
      *
      * @return string|null formatted file/line index (or NULL if unable to trace)
      */
-    public function trace()
+    public function trace(): ?string
     {
         $traces = debug_backtrace();
 
@@ -340,13 +368,13 @@ class TestDriver
     /**
      * Print the results of code coverage analysis to the console
      *
-     * @param PHP_CodeCoverage $coverage
+     * @param CodeCoverage $coverage
      *
      * @return void
      */
-    public function printCodeCoverageResult(PHP_CodeCoverage $coverage)
+    public function printCodeCoverageResult(CodeCoverage $coverage)
     {
-        $report = new PHP_CodeCoverage_Report_Text(10, 90, false, false);
+        $report = new Report\Text(10, 90, false, false);
 
         echo $report->process($coverage, false);
     }
@@ -354,15 +382,86 @@ class TestDriver
     /**
      * Output the results of code coverage analysis to an XML file
      *
-     * @param PHP_CodeCoverage $coverage
-     * @param string           $coverage_output_path
+     * @param CodeCoverage $coverage
+     * @param string       $coverage_output_path
      *
      * @return void
      */
     public function outputCodeCoverageReport($coverage, $coverage_output_path)
     {
-        $report = new PHP_CodeCoverage_Report_Clover();
+        $report = new Report\Clover();
 
         $report->process($coverage, $coverage_output_path);
+    }
+
+    const COLOR_RED = "\033[31m";
+    const COLOR_GREEN = "\033[32m";
+    const COLOR_RESET = "\033[39m";
+
+    /**
+     * Renders a color-coded, line-by-line diff of two given multi-line strings.
+     * 
+     * @param string $old
+     * @param string $new
+     *
+     * @return string
+     */
+    public function formatDiff(string $old, string $new): string
+    {
+        $result = "";
+        $diff = self::diff(explode("\n", $old), explode("\n", $new));
+        
+        foreach ($diff as $node) {
+            if (is_array($node)) {
+                $result .= (! empty($node["d"]) ? self::COLOR_RED . "+ " . implode("\n", $node["d"]) : "") .
+                    (! empty($node["i"]) ? self::COLOR_GREEN . "- " . implode("\n", $node["i"]) : "")
+                    . "\n";
+            } else {
+                $result .= self::COLOR_RESET . "  " . $node . "\n";
+            }
+        }
+        
+        return $result . self::COLOR_RESET;
+    }
+
+    /**
+     * @param string[] $old
+     * @param string[] $new
+     *
+     * @return string|array mixed list of unchanged strings and tuples where "d" and "i" => deleted/inserted strings
+     */
+    private static function diff(array $old, array $new)
+    {
+        // https://github.com/paulgb/simplediff/blob/master/php/simplediff.php
+        
+        $matrix = [];
+        $maxlen = 0;
+
+        foreach ($old as $oindex => $ovalue) {
+            $nkeys = array_keys($new, $ovalue);
+
+            foreach ($nkeys as $nindex) {
+                $matrix[$oindex][$nindex] = isset($matrix[$oindex - 1][$nindex - 1])
+                    ? $matrix[$oindex - 1][$nindex - 1] + 1
+                    : 1;
+
+                if ($matrix[$oindex][$nindex] > $maxlen) {
+                    $maxlen = $matrix[$oindex][$nindex];
+
+                    $omax = $oindex + 1 - $maxlen;
+                    $nmax = $nindex + 1 - $maxlen;
+                }
+            }
+        }
+
+        if ($maxlen === 0) {
+            return [["d" => $old, "i" => $new]];
+        }
+
+        return array_merge(
+            self::diff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
+            array_slice($new, $nmax, $maxlen),
+            self::diff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen))
+        );
     }
 }

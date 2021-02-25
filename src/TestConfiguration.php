@@ -2,13 +2,15 @@
 
 namespace mindplay\testies;
 
-use PHP_CodeCoverage;
-use PHP_CodeCoverage_Exception;
+use RuntimeException;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Driver\Selector;
+use SebastianBergmann\CodeCoverage\Filter;
 
 /**
  * This class creates and configures the test-driver.
  *
- * It's exposed via the {@link configure()} function.
+ * It's exposed via the {@see configure()} function.
  */
 class TestConfiguration
 {
@@ -24,7 +26,7 @@ class TestConfiguration
     {
         $this->driver = $driver ?: $this->createDefaultDriver();
 
-        if (\enabled("verbose", "v")) {
+        if (enabled("verbose", "v")) {
             $this->enableVerboseOutput();
         }
     }
@@ -36,31 +38,31 @@ class TestConfiguration
      *
      * @link https://packagist.org/packages/phpunit/php-code-coverage
      *
-     * @param string               $output_path  absolute path to code coverage (clover.xml) file
+     * @param string          $output_path       absolute path to code coverage (clover.xml) file
      *                                           example: __DIR__ . '/build/logs/clover.xml'
-     * @param string|string[]|null $source_paths one or more paths to source folders (of code being tested)
+     * @param string|string[] $source_paths      one or more paths to source folders (of code being tested)
      *                                           example: dirname(__DIR__) . '/src'
      *
      * @return $this
      */
-    public function enableCodeCoverage($output_path = null, $source_paths = null)
+    public function enableCodeCoverage(string $output_path = null, $source_paths = [])
     {
-        if (class_exists('PHP_CodeCoverage')) {
+        if (class_exists(CodeCoverage::class)) {
             try {
-                $coverage = new PHP_CodeCoverage;
+                $filter = new Filter();
 
-                if ($source_paths) {
-                    $filter = $coverage->filter();
-
-                    foreach ((array)$source_paths as $path) {
-                        $filter->addDirectoryToWhiteList($path);
-                    }
+                foreach ((array)$source_paths as $path) {
+                    $filter->includeDirectory($path);
                 }
+
+                $selector = new Selector();
+                $driver = $selector->forLineCoverage($filter);
+                $coverage = new CodeCoverage($driver, $filter);
 
                 $this->driver->coverage = $coverage;
                 $this->driver->coverage_output_path = $output_path;
-            } catch (PHP_CodeCoverage_Exception $e) {
-                echo "# Notice: no code coverage run-time available\n";
+            } catch (RuntimeException $e) {
+                echo "# Notice: {$e->getMessage()}\n";
             }
         } else {
             echo "# Notice: php-code-coverage not installed\n";
