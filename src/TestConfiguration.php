@@ -4,6 +4,8 @@ namespace mindplay\testies;
 
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Driver\Selector;
+use SebastianBergmann\CodeCoverage\Filter;
 
 /**
  * This class creates and configures the test-driver.
@@ -47,13 +49,15 @@ class TestConfiguration
     {
         if (class_exists(CodeCoverage::class)) {
             try {
-                $coverage = new CodeCoverage();
-
-                $filter = $coverage->filter();
+                $filter = new Filter();
 
                 foreach ((array)$source_paths as $path) {
-                    $filter->addDirectoryToWhitelist($path);
+                    $filter->includeDirectory($path);
                 }
+
+                $selector = new Selector();
+                $driver = $selector->forLineCoverage($filter);
+                $coverage = new CodeCoverage($driver, $filter);
 
                 $this->driver->coverage = $coverage;
                 $this->driver->coverage_output_path = $output_path;
