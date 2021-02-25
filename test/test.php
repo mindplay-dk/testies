@@ -96,6 +96,9 @@ run();
 
 $result = ob_get_clean();
 
+// TODO figure out how to test for expected output? it contains a stack-trace, which looks different when xdebug is installed.
+//file_put_contents(__DIR__."/expected-output.txt", $result);
+
 configure(new TestConfiguration());
 
 configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__) . "/src");
