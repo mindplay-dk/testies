@@ -2,7 +2,6 @@ mindplay/testies
 ================
 
 [![PHP Version](https://img.shields.io/badge/php-8.1%2B-blue.svg)](https://packagist.org/packages/mindplay/testies)
-[![Build Status](https://github.com/mindplay-dk/testies/actions/workflows/ci.yml/badge.svg)](https://travis-ci.org/mindplay-dk/testies)
 
 Yeah, testies: a lightweight library of functions for quick, simple unit-testing.
 
