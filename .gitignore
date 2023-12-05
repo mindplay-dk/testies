@@ -1,4 +1,4 @@
 .*
-!.git*
 /vendor/
 /test/build/**/*
+!.git*
