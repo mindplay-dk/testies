@@ -1,15 +1,12 @@
 <?php
 
-use mindplay\testies\TestConfiguration;
-use mindplay\testies\TestServer;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Zaphyr\HttpClient\Client;
-
 use function mindplay\testies\{configure, eq, expect, format, inspect, invoke, ok, run, test};
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
 
-configure()->enableVerboseOutput();
+//configure()->enableVerboseOutput();
+
+configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__));
 
 class Foo
 {
@@ -90,50 +87,4 @@ test(
     }
 );
 
-// TODO isolate the following test in a separate script
-
-ob_start();
-
 run();
-
-$result = ob_get_clean();
-
-configure(new TestConfiguration());
-
-configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__) . "/src");
-
-test(
-    "Check test result",
-    function () use ($result) {
-        $actual_output_path = __DIR__ . "/build/actual-output.txt";
-        $actual_output = str_replace("\r\n", "\n", file_get_contents($actual_output_path));
-
-        $expected_output_path = __DIR__ . "/expected-output.txt";
-        $expected_output = str_replace("\r\n", "\n", file_get_contents($expected_output_path));
-
-        eq(
-            $actual_output,
-            $expected_output,
-            "should produce test-output as dictated in \"expected-output.txt\""
-        );
-    }
-);
-
-test(
-    "Can run a local test-server",
-    function () {
-        $server = new TestServer(__DIR__, 8088);
-
-        $http = new Psr17Factory();
-        $client = new Client($http, $http);
-
-        $response = $client->sendRequest($http->createRequest("GET", "http://127.0.0.1:8088/server.php"));
-
-        eq($response->getStatusCode(), 200, "it should return a 200 status code");
-        ok($response->getBody() == "it works!", "it should return the script output");
-
-        unset($server);
-    }
-);
-
-exit(run()); // exits with errorlevel (for CI tools etc.)

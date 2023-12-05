@@ -6,9 +6,13 @@ use Closure;
 use Error;
 use ErrorException;
 use Exception;
+use mindplay\readable;
+use ReflectionClass;
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Report;
+use SebastianBergmann\CodeCoverage\Report\Thresholds;
+use Throwable;
 
 /**
  * This class implements the default driver for testing.
@@ -155,11 +159,7 @@ class TestDriver
                 if ($this->teardown) {
                     call_user_func($this->teardown);
                 }
-            } catch (Exception $e) {
-                $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
-
-                $thrown = $e;
-            } catch (Error $e) {
+            } catch (Throwable $e) {
                 $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
 
                 $thrown = $e;
@@ -186,7 +186,9 @@ class TestDriver
             if ($this->coverage_output_path) {
                 $this->outputCodeCoverageReport($this->coverage, $this->coverage_output_path);
 
-                echo "\n* code coverage report created: {$this->coverage_output_path}\n";
+                $coverage_output_path = readable::path($this->coverage_output_path);
+
+                echo "\n* code coverage report created: {$coverage_output_path}\n";
             }
         }
 
@@ -266,8 +268,8 @@ class TestDriver
         }
 
         echo ($result === true ? "PASS" : "FAIL")
-            . ($trace ? " [{$trace}]" : "")
-            . ($why ? " {$why}" : "")
+            . (" {$trace}")
+            . ($why ? ": {$why}" : ":")
             . $output . "\n";
     }
 
@@ -295,7 +297,9 @@ class TestDriver
             $details = $value->getMessage();
 
             if ($detailed) {
-                $details .= "\n\nStacktrace:\n" . $value->getTraceAsString();
+                $trace = readable::trace($value->getTrace(), with_params: true, relative_paths: true);
+
+                $details .= "\n\nStacktrace:\n" . $this->indent($trace);
             }
 
             return get_class($value) . ":\n{$details}";
@@ -329,11 +333,11 @@ class TestDriver
     }
 
     /**
-     * Obtain a filename and line number index of a call made in a test-closure
+     * Obtain a filename and line number index of a call made in the current test-closure
      *
-     * @return string|null formatted file/line index (or NULL if unable to trace)
+     * @return string formatted file/line index
      */
-    public function trace(): ?string
+    public function trace(): string
     {
         $traces = debug_backtrace();
 
@@ -342,6 +346,8 @@ class TestDriver
         $skip = 0;
 
         $found = false;
+
+        // TODO review and improve this logic - it doesn't always work??
 
         while (count($traces)) {
             $trace = array_pop($traces);
@@ -358,11 +364,11 @@ class TestDriver
             }
 
             if ($found && isset($trace['file'])) {
-                return basename($trace['file']) . '#' . $trace['line'];
+                return readable::path($trace['file']) . '(' . $trace['line'] . ')';
             }
         }
 
-        return null;
+        return "[unknown function]";
     }
 
     /**
@@ -374,7 +380,11 @@ class TestDriver
      */
     public function printCodeCoverageResult(CodeCoverage $coverage)
     {
-        $report = new Report\Text(10, 90, false, false);
+        $report = new Report\Text(
+            Thresholds::from(10, 90),
+            showUncoveredFiles: false,
+            showOnlySummary: ! $this->verbose
+        );
 
         echo $report->process($coverage, false);
     }

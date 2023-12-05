@@ -10,19 +10,27 @@
         }
     ],
     "require": {
-        "php": "^7.3 || ^8.0"
+        "php": "^8.1",
+        "mindplay/readable": "^1.2@dev"
     },
     "require-dev": {
-        "phpunit/php-code-coverage": "^9.2.5",
-        "guzzlehttp/guzzle": "^6.3.3"
+        "phpunit/php-code-coverage": "^10.1.7",
+        "nyholm/psr7": "^1.8",
+        "zaphyr-org/http-client": "^1.0"
     },
     "suggest": {
-        "phpunit/php-code-coverage": "^9.2.5"
+        "phpunit/php-code-coverage": "^10.1.7"
     },
     "autoload": {
         "files": ["src/test.func.php"],
         "psr-4": {
             "mindplay\\testies\\": "src/"
         }
+    },
+    "scripts": {
+        "test": "composer capture && XDEBUG_MODE=coverage php -d 'zend.exception_ignore_args=0' test/test.php",
+        "example": "XDEBUG_MODE=coverage php -d 'zend.exception_ignore_args=0' test/example.php",
+        "capture": "XDEBUG_MODE=coverage php -d 'zend.exception_ignore_args=0' test/example.php > test/build/actual-output.txt",
+        "snapshot": "XDEBUG_MODE=coverage php -d 'zend.exception_ignore_args=0' test/example.php > test/expected-output.txt"
     }
 }

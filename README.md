@@ -1,6 +1,8 @@
 mindplay/testies
 ================
 
+[![PHP Version](https://img.shields.io/badge/php-8.1%2B-blue.svg)](https://packagist.org/packages/mindplay/readable)
+
 Yeah, testies: a lightweight library of functions for quick, simple unit-testing.
 
 Tries to honor the [Go language philosophy of testing](http://golang.org/doc/faq#How_do_I_write_a_unit_test) - paraphrasing:
@@ -9,9 +11,9 @@ Tries to honor the [Go language philosophy of testing](http://golang.org/doc/faq
 > mechanisms, but PHP already has all those capabilities; why recreate them? We'd rather write tests in PHP; it's one
 > fewer language to learn and the approach keeps the tests straightforward and easy to understand.
 
-The primary test API is procedural-style functions in the `test` namespace.
+The primary test API is a set of functions in the `mindplay\testies` namespace.
 
-Internally, the procedural API is backed by a pair of simple driver and configuration classes - these are left
+Internally, the API is backed by a pair of simple "driver" and configuration classes - these are left
 as open as possible, and you should feel comfortable extending these and tailoring them specifically to suit the
 test-requirements for whatever you're testing.
 
@@ -52,7 +54,7 @@ exit(run()); // exits with errorlevel (for CI tools etc.)
 You can call `test()` as many times as you need to - the tests will queue up, and execute when you call `run()`.
 
 
-### Procedural API
+### API
 
 The following functions are available in the `mindplay\testies` namespace:
 
@@ -71,7 +73,7 @@ format($value, $detailed = false);         # format a value for use in diagnosti
 ```
 
 Rather than providing hundreds of assertion functions, you perform assertions using PHP expressions,
-often in concert with helper, and built-in standard functions in PHP - some examples:
+often in concert with your own helper functions, or built-in standard functions in PHP - some examples:
 
 ```php
 test(
@@ -119,7 +121,7 @@ test(
 );
 ```
 
-You can use the same approach to group multiple assertions:
+You can use the same approach to group multiple assertions for reuse:
 
 ```php
 function checkValue($value) {
@@ -136,35 +138,40 @@ test(
 );
 ```
 
-Keep in mind that diagnostic output always refers to the line number in the test-closure that
+Note that the diagnostic output will always refer to the line number in the test-closure that
 generated the assertion result.
 
 
 ## Test Server
 
-*This feature is very rough at the moment.*
+⚠️ *This feature is still rough.*
 
-As of release 5.4, PHP provides a [built-in development web server](http://php.net/manual/en/features.commandline.webserver.php). 
+PHP provides a [built-in development web server](http://php.net/manual/en/features.commandline.webserver.php). 
 
-For test scenarios where the code needs to run out-of-process (such as [mockery](https://packagist.org/packages/mockery/mockery),
-[phake](https://packagist.org/packages/phake/phake) or [phpunit](https://packagist.org/packages/phpunit/phpunit-mock-objects))
-or if you need to check the response from a script (e.g. using [guzzle](https://packagist.org/packages/guzzlehttp/guzzle)),
-we provide a simple wrapper class to launch and shut down a server:
+For basic integration tests, a simple wrapper class to launch and shut down a server is provided - the
+following example uses `nyholm/psr7` and the `zaphyr-org/http-client` client library:
 
 ```php
-use GuzzleHttp\Client;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Zaphyr\HttpClient\Client;
+use function mindplay\testies\{test, ok, eq};
 
 $server = new TestServer(__DIR__, 8088);
 
 test(
     'Can get home page',
     function () {
-        $client = new Client();
+        $server = new TestServer(__DIR__, 8088);
 
-        $response = $client->get('http://127.0.0.1:8088/index.php');
+        $http = new Psr17Factory();
+
+        $client = new Client($http, $http);
+
+        $response = $client->sendRequest($http->createRequest("GET", "http://127.0.0.1:8088/index.php"));
 
         eq($response->getStatusCode(), 200);
-        ok(strpos($response->getBody(), '<title>Welcome</title>') !== false);
+
+        ok(strpos($response->getBody(), '<title>Welcome</title>') !== false, "it should capture the response body");
     }
 );
 ```
@@ -178,7 +185,6 @@ of clients, on the other hand, is recommended, as sharing client state could lea
 
 
 ## Options
-
 
 A few simple configuration options are provided via the `configure()` function, which provides access
 to the current instance of `TestConfiguration`.
@@ -261,7 +267,7 @@ class MyTestDriver extends TestDriver
     // ...
 }
 
-// Head off your test by selecting your custom driver object:
+// Boostrap your test by selecting your custom driver:
 
 configure(new TestConfiguration(new TestDriver));
 ```

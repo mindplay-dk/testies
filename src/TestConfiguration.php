@@ -52,7 +52,9 @@ class TestConfiguration
                 $filter = new Filter();
 
                 foreach ((array)$source_paths as $path) {
-                    $filter->includeDirectory($path);
+                    foreach (glob("{$path}/*", GLOB_ONLYDIR) as $dir) {
+                        $filter->includeFiles(array_filter(glob("{$dir}/*.php"), "is_file"));
+                    }
                 }
 
                 $selector = new Selector();

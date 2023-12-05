@@ -1,62 +1,48 @@
 
 === Hello World ===
 
-PASS [test.php#27]
-FAIL [test.php#28]
-PASS [test.php#30] why
-FAIL [test.php#31] why
-PASS [test.php#33] why (string)
-FAIL [test.php#34] why
+FAIL test/example.php(25):
+FAIL test/example.php(28): why
+FAIL test/example.php(31): why
   line 1
   line 2
-PASS [test.php#36] (string)
-PASS [test.php#40]
-  line 1
-  line 2
-  line 3
-FAIL [test.php#41]
+FAIL test/example.php(38):
 [39m  line 1
 [31m+ line 2
 [39m  line 3
 [32m- line 4
 [39m
-PASS [test.php#43] why (foo)
-FAIL [test.php#44] why (foo !== bar)
-PASS [test.php#46] (array[3])
-PASS [test.php#47] (TRUE)
-PASS [test.php#48] (FALSE)
-PASS [test.php#49] (Foo)
-PASS [test.php#51] (blip)
-PASS [test.php#53] (blip)
-PASS [test.php#60] why
-  RuntimeException:
-  boom
-PASS [test.php#69] why
-  RuntimeException:
-  booooooom
-FAIL [test.php#78] why (expected RuntimeException message did not match pattern: /bo+m/)
+FAIL test/example.php(41): why (foo !== bar)
+FAIL test/example.php(69): why (expected RuntimeException message did not match pattern: /bo+m/)
   RuntimeException:
   bam
   
   Stacktrace:
-  #0 [internal function]: {closure}()
-  #1 /mnt/c/workspace/mindplay-testies/src/test.func.php(137): call_user_func(Object(Closure))
-  #2 /mnt/c/workspace/mindplay-testies/test/test.php(78): mindplay\testies\expect('RuntimeExceptio...', 'why', Object(Closure), '/bo+m/')
-  #3 [internal function]: {closure}()
-  #4 /mnt/c/workspace/mindplay-testies/src/TestDriver.php(153): call_user_func(Object(Closure))
-  #5 /mnt/c/workspace/mindplay-testies/src/test.func.php(54): mindplay\testies\TestDriver->run()
-  #6 /mnt/c/workspace/mindplay-testies/test/test.php(95): mindplay\testies\run()
-  #7 {main}
-FAIL [test.php#86] why (expected exception RuntimeException was NOT thrown)
-FAIL UNEXPECTED EXCEPTION
+    1. [internal function] {closure}()
+    2. src/test.func.php:137 call_user_func({Closure in test/example.php(72)})
+    3. test/example.php:69 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(72)}, "/bo+m/")
+    4. [internal function] {closure}()
+    5. src/TestDriver.php:157 call_user_func({Closure in test/example.php(23)})
+    6. src/test.func.php:54 mindplay\testies\TestDriver->run()
+    7. test/example.php:90 mindplay\testies\run()
+FAIL test/example.php(78): why (expected exception RuntimeException was NOT thrown)
+FAIL [unknown function]: UNEXPECTED EXCEPTION
   RuntimeException:
   THE END
   
   Stacktrace:
-  #0 [internal function]: {closure}()
-  #1 /mnt/c/workspace/mindplay-testies/src/TestDriver.php(153): call_user_func(Object(Closure))
-  #2 /mnt/c/workspace/mindplay-testies/src/test.func.php(54): mindplay\testies\TestDriver->run()
-  #3 /mnt/c/workspace/mindplay-testies/test/test.php(95): mindplay\testies\run()
-  #4 {main}
+    1. [internal function] {closure}()
+    2. src/TestDriver.php:157 call_user_func({Closure in test/example.php(23)})
+    3. src/test.func.php:54 mindplay\testies\TestDriver->run()
+    4. test/example.php:90 mindplay\testies\run()
+
+
+Code Coverage Report Summary:
+  Classes: 20.00% (1/5)      
+  Methods: 25.00% (6/24)     
+  Lines:   46.61% (172/369)  
+
+
+* code coverage report created: test/build/clover.xml
 
 * 1 tests completed: 22 assertions, 8 failures
