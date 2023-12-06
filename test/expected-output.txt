@@ -38,9 +38,9 @@ FAIL [unknown function]: UNEXPECTED EXCEPTION
 
 
 Code Coverage Report Summary:
-  Classes: 20.00% (1/5)      
-  Methods: 25.00% (6/24)     
-  Lines:   46.61% (172/369)  
+  Classes:  0.00% (0/3)      
+  Methods: 21.74% (5/23)     
+  Lines:   55.36% (124/224)  
 
 
 * code coverage report created: test/build/clover.xml

@@ -6,7 +6,7 @@ require_once dirname(__DIR__) . "/vendor/autoload.php";
 
 //configure()->enableVerboseOutput();
 
-configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__));
+configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__) . "/src");
 
 class Foo
 {
