@@ -3,7 +3,6 @@
 namespace mindplay\testies;
 
 use Closure;
-use Error;
 use ErrorException;
 use Exception;
 use mindplay\readable;
@@ -275,11 +274,7 @@ class TestDriver
 
     public function printError(Throwable $error)
     {
-        $message = readable::error($error);
-        
-        $trace = $this->indent(readable::trace($error->getTrace(), with_params: true, relative_paths: true));
-
-        echo "ERROR {$message}\n{$trace}\n";
+        echo "ERROR\n" . $this->indent($this->formatError($error));
     }
 
     /**
@@ -302,16 +297,8 @@ class TestDriver
      */
     public function format($value, bool $detailed = false): string
     {
-        if ($value instanceof Exception || $value instanceof Error) {
-            $details = $value->getMessage();
-
-            if ($detailed) {
-                $trace = readable::trace($value->getTrace(), with_params: true, relative_paths: true);
-
-                $details .= "\n\nStacktrace:\n" . $this->indent($trace);
-            }
-
-            return get_class($value) . ":\n{$details}";
+        if ($value instanceof Throwable) {
+            return $this->formatError($value, $detailed);
         }
 
         if (! $detailed && is_array($value)) {
@@ -327,6 +314,22 @@ class TestDriver
         }
 
         return print_r($value, true);
+    }
+
+    public function formatError(Throwable $error, bool $detailed = true): string
+    {
+        $details = $error->getMessage();
+
+        if ($detailed) {
+            $trace = $error->getTrace();
+
+            // TODO filter out testies internals? maybe optional?
+            // $trace = array_values(array_filter($trace, fn ($frame) => ! str_starts_with($frame['file'] ?? "", __DIR__)));
+
+            $details .= "\n\nStacktrace:\n" . $this->indent(readable::trace($trace, with_params: true, relative_paths: true)) . "\n";
+        }
+
+        return get_class($error) . ": {$details}";
     }
 
     /**

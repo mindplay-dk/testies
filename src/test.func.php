@@ -134,7 +134,7 @@ function eq($value, $expected, ?string $why = null)
 function expect(string $exception_type, string $why, callable $function, $patterns = [])
 {
     try {
-        call_user_func($function);
+        $function();
     } catch (Throwable $error) {
         if ($error instanceof $exception_type) {
             foreach ((array) $patterns as $pattern) {

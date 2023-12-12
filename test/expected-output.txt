@@ -14,35 +14,30 @@ FAIL test/example.php(38):
 [39m
 FAIL test/example.php(41): why (foo !== bar)
 FAIL test/example.php(69): why (expected RuntimeException message did not match pattern: /bo+m/)
-  RuntimeException:
-  bam
+  RuntimeException: bam
   
   Stacktrace:
-    1. [internal function] {closure}()
-    2. src/test.func.php:137 call_user_func({Closure in test/example.php(72)})
-    3. test/example.php:69 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(72)}, "/bo+m/")
-    4. [internal function] {closure}()
-    5. src/TestDriver.php:157 call_user_func({Closure in test/example.php(23)})
-    6. src/test.func.php:54 mindplay\testies\TestDriver->run()
-    7. test/example.php:90 mindplay\testies\run()
+    1. src/test.func.php:137 {closure}()
+    2. test/example.php:69 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(72)}, "/bo+m/")
+    3. src/TestDriver.php:156 {closure}()
+    4. src/test.func.php:54 mindplay\testies\TestDriver->run()
+    5. test/example.php:90 mindplay\testies\run()
 FAIL test/example.php(78): why (expected exception RuntimeException was NOT thrown)
-FAIL [unknown function]: UNEXPECTED EXCEPTION
-  RuntimeException:
-  THE END
+ERROR
+  RuntimeException: THE END
   
   Stacktrace:
-    1. [internal function] {closure}()
-    2. src/TestDriver.php:157 call_user_func({Closure in test/example.php(23)})
-    3. src/test.func.php:54 mindplay\testies\TestDriver->run()
-    4. test/example.php:90 mindplay\testies\run()
+    1. src/TestDriver.php:156 {closure}()
+    2. src/test.func.php:54 mindplay\testies\TestDriver->run()
+    3. test/example.php:90 mindplay\testies\run()
 
 
 Code Coverage Report Summary:
   Classes:  0.00% (0/3)      
-  Methods: 21.74% (5/23)     
-  Lines:   55.36% (124/224)  
+  Methods: 28.00% (7/25)     
+  Lines:   52.94% (117/221)  
 
 
 * code coverage report created: test/build/clover.xml
 
-* 1 tests completed: 22 assertions, 8 failures
+* 1 tests completed: 21 assertions, 7 failures
