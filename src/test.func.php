@@ -128,8 +128,8 @@ function eq($value, $expected, ?string $why = null)
  * @param string          $why            reason for making this assertion
  * @param callable        $function       function expected to cause the exception
  * @param string|string[] $patterns       regular expression pattern(s) to test against the Exception message
- *
- * @void
+ * 
+ * @return void
  */
 function expect(string $exception_type, string $why, callable $function, $patterns = [])
 {

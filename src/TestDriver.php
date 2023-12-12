@@ -7,7 +7,7 @@ use Error;
 use ErrorException;
 use Exception;
 use mindplay\readable;
-use ReflectionClass;
+use ReflectionFunction;
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Report;
@@ -148,23 +148,23 @@ class TestDriver
             $this->current_test = $title;
 
             $thrown = null;
-
+    
             try {
                 if ($this->setup) {
-                    call_user_func($this->setup);
+                    ($this->setup)();
                 }
-
-                call_user_func($function);
-
+        
+                $function();
+        
                 if ($this->teardown) {
-                    call_user_func($this->teardown);
+                    ($this->teardown)();
                 }
             } catch (Throwable $e) {
-                $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
-
+                $this->printError($e);
+    
                 $thrown = $e;
             }
-
+    
             if ($thrown && $this->throw) {
                 throw new Exception("Exception while running test: {$title}", 0, $thrown);
             }
@@ -237,7 +237,7 @@ class TestDriver
             $this->last_test = $this->current_test;
         }
 
-        $trace = $this->trace();
+        $location = $this->trace();
 
         $detailed = $result === false;
 
@@ -268,9 +268,18 @@ class TestDriver
         }
 
         echo ($result === true ? "PASS" : "FAIL")
-            . (" {$trace}")
+            . (" {$location}")
             . ($why ? ": {$why}" : ":")
             . $output . "\n";
+    }
+
+    public function printError(Throwable $error)
+    {
+        $message = readable::error($error);
+        
+        $trace = $this->indent(readable::trace($error->getTrace(), with_params: true, relative_paths: true));
+
+        echo "ERROR {$message}\n{$trace}\n";
     }
 
     /**
@@ -339,36 +348,25 @@ class TestDriver
      */
     public function trace(): string
     {
-        $traces = debug_backtrace();
+        $traces = debug_backtrace(0);
 
         $current_function = $this->tests[$this->current_test];
 
-        $skip = 0;
+        $current_file = (new ReflectionFunction($current_function))->getFileName();
 
-        $found = false;
+        $selected_trace = null;
 
-        // TODO review and improve this logic - it doesn't always work??
+        for ($i=count($traces)-1; $i>=0; $i--) {
+            $trace = $traces[$i];
 
-        while (count($traces)) {
-            $trace = array_pop($traces);
-
-            if ($skip > 0) {
-                $skip -= 1;
-                continue; // skip closure
-            }
-
-            if (($trace['file'] === __FILE__) && (@$trace['args'][0] === $current_function)) {
-                $skip = 1;
-                $found = true;
-                continue; // skip call to run()
-            }
-
-            if ($found && isset($trace['file'])) {
-                return readable::path($trace['file']) . '(' . $trace['line'] . ')';
+            if ($trace['file'] === $current_file) {
+                $selected_trace = $trace;
             }
         }
 
-        return "[unknown function]";
+        return $selected_trace
+            ? readable::path($selected_trace['file']) . '(' . $selected_trace['line'] . ')'
+            : "[unknown function]";
     }
 
     /**
