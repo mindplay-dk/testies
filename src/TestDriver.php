@@ -424,9 +424,8 @@ class TestDriver
         
         foreach ($diff as $node) {
             if (is_array($node)) {
-                $result .= (! empty($node["d"]) ? self::COLOR_RED . "+ " . implode("\n", $node["d"]) : "") .
-                    (! empty($node["i"]) ? self::COLOR_GREEN . "- " . implode("\n", $node["i"]) : "")
-                    . "\n";
+                $result .= (! empty($node["d"]) ? self::COLOR_RED . "+ " . implode("\n", $node["d"]) . "\n" : "") .
+                    (! empty($node["i"]) ? self::COLOR_GREEN . "- " . implode("\n", $node["i"]) . "\n" : "");
             } else {
                 $result .= self::COLOR_RESET . "  " . $node . "\n";
             }

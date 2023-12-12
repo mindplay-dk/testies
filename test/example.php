@@ -36,6 +36,7 @@ test(
 
         eq("line 1\nline 2\nline 3", "line 1\nline 2\nline 3"); // equal
         eq("line 1\nline 2\nline 3", "line 1\nline 3\nline 4"); // not equal
+        eq("line 1\nline 2\nline 3", "line 1\nline 2!\nline 3"); // not equal
 
         eq("foo", "foo", "why");
         eq("foo", "bar", "why");
