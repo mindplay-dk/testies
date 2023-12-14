@@ -27,23 +27,32 @@ FAIL test/example.php(70): why (expected RuntimeException message did not match 
     2. test/example.php:70 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(73)}, "/bo+m/")
     3. src/TestDriver.php:156 {closure}()
     4. src/test.func.php:54 mindplay\testies\TestDriver->run()
-    5. test/example.php:91 mindplay\testies\run()
-FAIL test/example.php(79): why (expected exception RuntimeException was NOT thrown)
+    5. test/example.php:100 mindplay\testies\run()
+FAIL test/example.php(79): why (expected RuntimeException but InvalidArgumentException was thrown)
+  InvalidArgumentException: bam
+  
+  Stacktrace:
+    1. src/test.func.php:137 {closure}()
+    2. test/example.php:79 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(82)}, "/bam/")
+    3. src/TestDriver.php:156 {closure}()
+    4. src/test.func.php:54 mindplay\testies\TestDriver->run()
+    5. test/example.php:100 mindplay\testies\run()
+FAIL test/example.php(88): why (expected exception RuntimeException was NOT thrown)
 ERROR
   RuntimeException: THE END
   
   Stacktrace:
     1. src/TestDriver.php:156 {closure}()
     2. src/test.func.php:54 mindplay\testies\TestDriver->run()
-    3. test/example.php:91 mindplay\testies\run()
+    3. test/example.php:100 mindplay\testies\run()
 
 
 Code Coverage Report Summary:
   Classes:  0.00% (0/3)      
   Methods: 28.00% (7/25)     
-  Lines:   52.73% (116/220)  
+  Lines:   53.64% (118/220)  
 
 
 * code coverage report created: test/build/clover.xml
 
-* 1 tests completed: 22 assertions, 8 failures
+* 1 tests completed: 23 assertions, 9 failures

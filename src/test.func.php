@@ -148,7 +148,7 @@ function expect(string $exception_type, string $why, callable $function, $patter
         } else {
             $actual_type = get_class($error);
 
-            ok(false, "$why (expected {$exception_type} but {$actual_type} was thrown)");
+            ok(false, "$why (expected {$exception_type} but {$actual_type} was thrown)", $error);
         }
 
         return;

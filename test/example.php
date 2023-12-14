@@ -73,14 +73,23 @@ test(
             function () {
                 throw new RuntimeException("bam");
             },
-            "/bo+m/" // fails
+            "/bo+m/" // fails: unexpected exception message
         );
 
         expect(
             RuntimeException::class,
             "why",
             function () {
-                // doesn't throw
+                throw new InvalidArgumentException("bam");
+            },
+            "/bam/" // fails: wrong exception type
+        );
+
+        expect(
+            RuntimeException::class,
+            "why",
+            function () {
+                // fails: doesn't throw at all
             }
         );
 
