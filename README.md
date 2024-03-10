@@ -1,7 +1,7 @@
 mindplay/testies
 ================
 
-[![PHP Version](https://img.shields.io/badge/php-8.1%2B-blue.svg)](https://packagist.org/packages/mindplay/testies)
+[![PHP Version](https://img.shields.io/badge/php-8.0%2B-blue.svg)](https://packagist.org/packages/mindplay/testies)
 
 Yeah, testies: a lightweight library of functions for quick, simple unit-testing.
 

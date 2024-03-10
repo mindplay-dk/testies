@@ -65,15 +65,15 @@ ERROR
 
 
 Code Coverage Report:
-  2024-03-10 14:14:22
+  2024-03-10 14:49:06
 
  Summary:
   Classes:  0.00% (0/4)
   Methods: 23.53% (8/34)
-  Lines:   49.71% (173/348)
+  Lines:   48.73% (173/355)
 
 mindplay\testies\TestDriver
-  Methods:  41.18% ( 7/17)   Lines:  68.92% (102/148)
+  Methods:  41.18% ( 7/17)   Lines:  65.81% (102/155)
 mindplay\testies\readable
   Methods:  12.50% ( 1/ 8)   Lines:  37.93% ( 44/116)
 

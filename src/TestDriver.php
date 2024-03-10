@@ -400,11 +400,18 @@ class TestDriver
      */
     public function printCodeCoverageResult(CodeCoverage $coverage)
     {
-        $report = new Report\Text(
-            Thresholds::from(10, 90),
-            showUncoveredFiles: false,
-            showOnlySummary: ! $this->verbose
-        );
+        $report = class_exists(Thresholds::class)
+            ? new Report\Text(
+                Thresholds::from(10, 90),
+                showUncoveredFiles: false,
+                showOnlySummary: !$this->verbose
+            )
+            : new Report\Text(
+                lowUpperBound: 10,
+                highLowerBound: 90,
+                showUncoveredFiles: false,
+                showOnlySummary: !$this->verbose
+            );
 
         echo $report->process($coverage, false);
     }

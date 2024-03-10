@@ -10,19 +10,22 @@ require_once dirname(__DIR__) . "/vendor/autoload.php";
 
 configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__) . "/src");
 
-function strip_date(string $str): string
+function clean_report(string $str): string
 {
-    return preg_replace('/(Code Coverage Report:\r?\n).*?(\r?\n)/', '${1}DATE$2', $str);
+    $str = preg_replace('/[\r\n]/', "\n", $str);                                     // normalize line-endings
+    $str = preg_replace('/(Code Coverage Report:.*\n).*?(\n)/', '${1}DATE$2', $str); // remove date/time
+    $str = preg_replace('/\s+$/m', '', $str);                                        // clean trailing white space
+    return $str;
 }
 
 test(
     "Check test result",
     function () {
         $actual_output_path = __DIR__ . "/build/actual-output.txt";
-        $actual_output = str_replace("\r\n", "\n", strip_date(file_get_contents($actual_output_path)));
+        $actual_output = clean_report(file_get_contents($actual_output_path));
 
         $expected_output_path = __DIR__ . "/expected-output.txt";
-        $expected_output = str_replace("\r\n", "\n", strip_date(file_get_contents($expected_output_path)));
+        $expected_output = clean_report(file_get_contents($expected_output_path));
 
         eq(
             $actual_output,

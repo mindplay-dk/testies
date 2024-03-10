@@ -10,16 +10,16 @@
         }
     ],
     "require": {
-        "php": "^8.1"
+        "php": "^8.0"
     },
     "require-dev": {
-        "phpunit/php-code-coverage": "^10.1.7",
+        "phpunit/php-code-coverage": "^9 || ^10 || ^11",
         "nyholm/psr7": "^1.8",
         "zaphyr-org/http-client": "^1.0",
         "mindplay/readable": "^1.2"
     },
     "suggest": {
-        "phpunit/php-code-coverage": "^10 || ^11"
+        "phpunit/php-code-coverage": "^9 || ^10 || ^11"
     },
     "autoload": {
         "files": ["src/test.func.php"],
