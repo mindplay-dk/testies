@@ -5,7 +5,6 @@ namespace mindplay\testies;
 use Closure;
 use ErrorException;
 use Exception;
-use mindplay\readable;
 use ReflectionFunction;
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;

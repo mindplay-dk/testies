@@ -42,7 +42,7 @@ FAIL test/example.php(70): why (expected RuntimeException message did not match 
   Stacktrace:
     1. src/test.func.php:137 {closure}()
     2. test/example.php:70 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(73)}, "/bo+m/")
-    3. src/TestDriver.php:156 {closure}()
+    3. src/TestDriver.php:155 {closure}()
     4. src/test.func.php:54 mindplay\testies\TestDriver->run()
     5. test/example.php:100 mindplay\testies\run()
 FAIL test/example.php(79): why (expected RuntimeException but InvalidArgumentException was thrown)
@@ -51,7 +51,7 @@ FAIL test/example.php(79): why (expected RuntimeException but InvalidArgumentExc
   Stacktrace:
     1. src/test.func.php:137 {closure}()
     2. test/example.php:79 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(82)}, "/bam/")
-    3. src/TestDriver.php:156 {closure}()
+    3. src/TestDriver.php:155 {closure}()
     4. src/test.func.php:54 mindplay\testies\TestDriver->run()
     5. test/example.php:100 mindplay\testies\run()
 FAIL test/example.php(88): why (expected exception RuntimeException was NOT thrown)
@@ -59,21 +59,23 @@ ERROR
   RuntimeException: THE END
   
   Stacktrace:
-    1. src/TestDriver.php:156 {closure}()
+    1. src/TestDriver.php:155 {closure}()
     2. src/test.func.php:54 mindplay\testies\TestDriver->run()
     3. test/example.php:100 mindplay\testies\run()
 
 
 Code Coverage Report:
-  2024-03-10 11:03:25
+  2024-03-10 13:30:26
 
  Summary:
-  Classes:  0.00% (0/3)
-  Methods: 26.92% (7/26)
-  Lines:   55.41% (128/231)
+  Classes:  0.00% (0/4)
+  Methods: 23.53% (8/34)
+  Lines:   45.69% (159/348)
 
 mindplay\testies\TestDriver
   Methods:  41.18% ( 7/17)   Lines:  68.92% (102/148)
+mindplay\testies\readable
+  Methods:  12.50% ( 1/ 8)   Lines:  25.86% ( 30/116)
 
 * code coverage report created: test/build/clover.xml
 

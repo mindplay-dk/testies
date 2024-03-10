@@ -4,29 +4,31 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "47d58a3bb5b0a11b2d47c0769e0ea206",
-    "packages": [
+    "content-hash": "049caf4feedb98577c0e374459cb58d4",
+    "packages": [],
+    "packages-dev": [
         {
             "name": "mindplay/readable",
-            "version": "1.2.0.x-dev",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mindplay-dk/readable.git",
-                "reference": "917aa44f07c8a7e279a9632f6144c2f38569d3e7"
+                "reference": "b9ec123fab2112474ee6f9f43e41bfd2c72e0166"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mindplay-dk/readable/zipball/917aa44f07c8a7e279a9632f6144c2f38569d3e7",
-                "reference": "917aa44f07c8a7e279a9632f6144c2f38569d3e7",
+                "url": "https://api.github.com/repos/mindplay-dk/readable/zipball/b9ec123fab2112474ee6f9f43e41bfd2c72e0166",
+                "reference": "b9ec123fab2112474ee6f9f43e41bfd2c72e0166",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.0"
+                "php": "^8.1"
             },
             "require-dev": {
-                "mindplay/testies": "^1.0",
-                "phpunit/php-code-coverage": "^9.2.5"
+                "mindplay/testies": "^1.1",
+                "phpunit/php-code-coverage": "^10"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "classmap": [
@@ -42,10 +44,8 @@
                 "issues": "https://github.com/mindplay-dk/readable/issues",
                 "source": "https://github.com/mindplay-dk/readable/tree/master"
             },
-            "time": "2023-12-05T11:30:37+00:00"
-        }
-    ],
-    "packages-dev": [
+            "time": "2024-03-10T12:28:26+00:00"
+        },
         {
             "name": "nikic/php-parser",
             "version": "v5.0.2",
