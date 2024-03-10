@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "049caf4feedb98577c0e374459cb58d4",
+    "content-hash": "5f639f6e4ba888acbc3f66dfededa637",
     "packages": [],
     "packages-dev": [
         {
             "name": "mindplay/readable",
-            "version": "dev-master",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mindplay-dk/readable.git",
-                "reference": "b9ec123fab2112474ee6f9f43e41bfd2c72e0166"
+                "reference": "919de80c2b7c20ac7bb22ffd770e66d654111671"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mindplay-dk/readable/zipball/b9ec123fab2112474ee6f9f43e41bfd2c72e0166",
-                "reference": "b9ec123fab2112474ee6f9f43e41bfd2c72e0166",
+                "url": "https://api.github.com/repos/mindplay-dk/readable/zipball/919de80c2b7c20ac7bb22ffd770e66d654111671",
+                "reference": "919de80c2b7c20ac7bb22ffd770e66d654111671",
                 "shasum": ""
             },
             "require": {
@@ -28,7 +28,6 @@
                 "mindplay/testies": "^1.1",
                 "phpunit/php-code-coverage": "^10"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "classmap": [
@@ -42,9 +41,9 @@
             "description": "Formats PHP values as human-readable strings",
             "support": {
                 "issues": "https://github.com/mindplay-dk/readable/issues",
-                "source": "https://github.com/mindplay-dk/readable/tree/master"
+                "source": "https://github.com/mindplay-dk/readable/tree/1.2.0"
             },
-            "time": "2024-03-10T12:28:26+00:00"
+            "time": "2024-03-10T13:49:02+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -944,9 +943,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "mindplay/readable": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
