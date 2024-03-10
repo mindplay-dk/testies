@@ -51,10 +51,8 @@ class TestConfiguration
             try {
                 $filter = new Filter();
 
-                foreach ((array)$source_paths as $path) {
-                    $filter->includeDirectory($path);
-                }
-
+                $filter->includeFiles($this->findSourceFiles((array)$source_paths));
+                
                 $selector = new Selector();
                 $driver = $selector->forLineCoverage($filter);
                 $coverage = new CodeCoverage($driver, $filter);
@@ -69,6 +67,26 @@ class TestConfiguration
         }
 
         return $this;
+    }
+
+    /**
+     * @param string[] list of source folder paths
+     * 
+     * @return string[] list of PHP file paths
+     */
+    private function findSourceFiles(array $paths): array
+    {
+        $files = [];
+
+        foreach ($paths as $path) {
+            $files = array_merge(
+                $files,
+                array_filter(glob("{$path}/*.php"), "is_file"),
+                $this->findSourceFiles(glob("{$path}/*", GLOB_ONLYDIR))
+            );
+        }
+
+        return $files;
     }
 
     /**

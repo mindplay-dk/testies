@@ -3,12 +3,15 @@
 namespace mindplay\testies;
 
 use Closure;
-use Error;
 use ErrorException;
 use Exception;
+use mindplay\readable;
+use ReflectionFunction;
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Report;
+use SebastianBergmann\CodeCoverage\Report\Thresholds;
+use Throwable;
 
 /**
  * This class implements the default driver for testing.
@@ -144,27 +147,23 @@ class TestDriver
             $this->current_test = $title;
 
             $thrown = null;
-
+    
             try {
                 if ($this->setup) {
-                    call_user_func($this->setup);
+                    ($this->setup)();
                 }
-
-                call_user_func($function);
-
+        
+                $function();
+        
                 if ($this->teardown) {
-                    call_user_func($this->teardown);
+                    ($this->teardown)();
                 }
-            } catch (Exception $e) {
-                $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
-
-                $thrown = $e;
-            } catch (Error $e) {
-                $this->printResult(false, "UNEXPECTED EXCEPTION", $e);
-
+            } catch (Throwable $e) {
+                $this->printError($e);
+    
                 $thrown = $e;
             }
-
+    
             if ($thrown && $this->throw) {
                 throw new Exception("Exception while running test: {$title}", 0, $thrown);
             }
@@ -186,7 +185,9 @@ class TestDriver
             if ($this->coverage_output_path) {
                 $this->outputCodeCoverageReport($this->coverage, $this->coverage_output_path);
 
-                echo "\n* code coverage report created: {$this->coverage_output_path}\n";
+                $coverage_output_path = readable::path($this->coverage_output_path);
+
+                echo "\n* code coverage report created: {$coverage_output_path}\n";
             }
         }
 
@@ -235,7 +236,7 @@ class TestDriver
             $this->last_test = $this->current_test;
         }
 
-        $trace = $this->trace();
+        $location = $this->trace();
 
         $detailed = $result === false;
 
@@ -266,9 +267,14 @@ class TestDriver
         }
 
         echo ($result === true ? "PASS" : "FAIL")
-            . ($trace ? " [{$trace}]" : "")
-            . ($why ? " {$why}" : "")
+            . (" {$location}")
+            . ($why ? ": {$why}" : ":")
             . $output . "\n";
+    }
+
+    public function printError(Throwable $error)
+    {
+        echo "ERROR\n" . $this->indent($this->formatError($error));
     }
 
     /**
@@ -291,14 +297,8 @@ class TestDriver
      */
     public function format($value, bool $detailed = false): string
     {
-        if ($value instanceof Exception || $value instanceof Error) {
-            $details = $value->getMessage();
-
-            if ($detailed) {
-                $details .= "\n\nStacktrace:\n" . $value->getTraceAsString();
-            }
-
-            return get_class($value) . ":\n{$details}";
+        if ($value instanceof Throwable) {
+            return $this->formatError($value, $detailed);
         }
 
         if (! $detailed && is_array($value)) {
@@ -313,7 +313,29 @@ class TestDriver
             return get_class($value);
         }
 
+        if (is_string($value)) {
+            $lines = explode("\n", $value);
+            $lines = array_map([$this, "escape"], $lines);
+            $value = implode("\n", $lines);
+        }
+
         return print_r($value, true);
+    }
+
+    public function formatError(Throwable $error, bool $detailed = true): string
+    {
+        $details = $error->getMessage();
+
+        if ($detailed) {
+            $trace = $error->getTrace();
+
+            // TODO filter out testies internals? maybe optional?
+            // $trace = array_values(array_filter($trace, fn ($frame) => ! str_starts_with($frame['file'] ?? "", __DIR__)));
+
+            $details .= "\n\nStacktrace:\n" . $this->indent(readable::trace($trace, with_params: true, relative_paths: true)) . "\n";
+        }
+
+        return get_class($error) . ": {$details}";
     }
 
     /**
@@ -329,40 +351,45 @@ class TestDriver
     }
 
     /**
-     * Obtain a filename and line number index of a call made in a test-closure
-     *
-     * @return string|null formatted file/line index (or NULL if unable to trace)
+     * Escape non-printable ASCII control codes for display
      */
-    public function trace(): ?string
+    public function escape(string $str): string
     {
-        $traces = debug_backtrace();
+        return preg_replace_callback(
+            '/([\x00\x07\x08\x09\x0A\x0B\x0C\x0D\x1B\x7F])/u',
+            function ($matches) {
+                return '\\x' . strtoupper(dechex(ord($matches[1])));
+            },
+            $str
+        );
+    }
+
+    /**
+     * Obtain a filename and line number index of a call made in the current test-closure
+     *
+     * @return string formatted file/line index
+     */
+    public function trace(): string
+    {
+        $traces = debug_backtrace(0);
 
         $current_function = $this->tests[$this->current_test];
 
-        $skip = 0;
+        $current_file = (new ReflectionFunction($current_function))->getFileName();
 
-        $found = false;
+        $selected_trace = null;
 
-        while (count($traces)) {
-            $trace = array_pop($traces);
+        for ($i=count($traces)-1; $i>=0; $i--) {
+            $trace = $traces[$i];
 
-            if ($skip > 0) {
-                $skip -= 1;
-                continue; // skip closure
-            }
-
-            if (($trace['file'] === __FILE__) && (@$trace['args'][0] === $current_function)) {
-                $skip = 1;
-                $found = true;
-                continue; // skip call to run()
-            }
-
-            if ($found && isset($trace['file'])) {
-                return basename($trace['file']) . '#' . $trace['line'];
+            if ($trace['file'] === $current_file) {
+                $selected_trace = $trace;
             }
         }
 
-        return null;
+        return $selected_trace
+            ? readable::path($selected_trace['file']) . '(' . $selected_trace['line'] . ')'
+            : "[unknown function]";
     }
 
     /**
@@ -374,7 +401,11 @@ class TestDriver
      */
     public function printCodeCoverageResult(CodeCoverage $coverage)
     {
-        $report = new Report\Text(10, 90, false, false);
+        $report = new Report\Text(
+            Thresholds::from(10, 90),
+            showUncoveredFiles: false,
+            showOnlySummary: ! $this->verbose
+        );
 
         echo $report->process($coverage, false);
     }
@@ -413,9 +444,8 @@ class TestDriver
         
         foreach ($diff as $node) {
             if (is_array($node)) {
-                $result .= (! empty($node["d"]) ? self::COLOR_RED . "+ " . implode("\n", $node["d"]) : "") .
-                    (! empty($node["i"]) ? self::COLOR_GREEN . "- " . implode("\n", $node["i"]) : "")
-                    . "\n";
+                $result .= (! empty($node["d"]) ? self::COLOR_RED . "+ " . implode("\n", $node["d"]) . "\n" : "") .
+                    (! empty($node["i"]) ? self::COLOR_GREEN . "- " . implode("\n", $node["i"]) . "\n" : "");
             } else {
                 $result .= self::COLOR_RESET . "  " . $node . "\n";
             }
