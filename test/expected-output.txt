@@ -1,11 +1,19 @@
 
 === Hello World ===
 
+PASS test/example.php(24):
 FAIL test/example.php(25):
+PASS test/example.php(27): why
 FAIL test/example.php(28): why
+PASS test/example.php(30): why (string)
 FAIL test/example.php(31): why
   line 1
   line 2
+PASS test/example.php(33): (string)
+PASS test/example.php(37):
+  line 1
+  line 2
+  line 3
 FAIL test/example.php(38):
 [39m  line 1
 [31m+ line 2
@@ -18,7 +26,16 @@ FAIL test/example.php(39):
 [32m- line 2!
 [39m  line 3
 [39m
+PASS test/example.php(41): why (foo)
 FAIL test/example.php(42): why (foo !== bar)
+PASS test/example.php(44): (array[3])
+PASS test/example.php(45): (TRUE)
+PASS test/example.php(46): (FALSE)
+PASS test/example.php(47): (Foo)
+PASS test/example.php(49): (blip)
+PASS test/example.php(51): (blip)
+PASS test/example.php(53): why (RuntimeException: boom)
+PASS test/example.php(61): why (RuntimeException: booooooom)
 FAIL test/example.php(70): why (expected RuntimeException message did not match pattern: /bo+m/)
   RuntimeException: bam
   
@@ -47,11 +64,16 @@ ERROR
     3. test/example.php:100 mindplay\testies\run()
 
 
-Code Coverage Report Summary:
-  Classes:  0.00% (0/3)      
-  Methods: 28.00% (7/25)     
-  Lines:   53.64% (118/220)  
+Code Coverage Report:
+  2024-03-10 11:03:25
 
+ Summary:
+  Classes:  0.00% (0/3)
+  Methods: 26.92% (7/26)
+  Lines:   55.41% (128/231)
+
+mindplay\testies\TestDriver
+  Methods:  41.18% ( 7/17)   Lines:  68.92% (102/148)
 
 * code coverage report created: test/build/clover.xml
 

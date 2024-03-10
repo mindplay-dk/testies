@@ -4,7 +4,7 @@ use function mindplay\testies\{configure, eq, expect, format, inspect, invoke, o
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
 
-//configure()->enableVerboseOutput();
+configure()->enableVerboseOutput();
 
 configure()->enableCodeCoverage(__DIR__ . "/build/clover.xml", dirname(__DIR__) . "/src");
 

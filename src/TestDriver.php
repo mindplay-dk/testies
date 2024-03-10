@@ -313,6 +313,12 @@ class TestDriver
             return get_class($value);
         }
 
+        if (is_string($value)) {
+            $lines = explode("\n", $value);
+            $lines = array_map([$this, "escape"], $lines);
+            $value = implode("\n", $lines);
+        }
+
         return print_r($value, true);
     }
 
@@ -342,6 +348,20 @@ class TestDriver
     public function indent(string $str): string
     {
         return "  " . implode("\n  ", explode("\n", trim($str))) . "\n";
+    }
+
+    /**
+     * Escape non-printable ASCII control codes for display
+     */
+    public function escape(string $str): string
+    {
+        return preg_replace_callback(
+            '/([\x00\x07\x08\x09\x0A\x0B\x0C\x0D\x1B\x7F])/u',
+            function ($matches) {
+                return '\\x' . strtoupper(dechex(ord($matches[1])));
+            },
+            $str
+        );
     }
 
     /**
