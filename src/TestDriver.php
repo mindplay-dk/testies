@@ -381,7 +381,7 @@ class TestDriver
         for ($i=count($traces)-1; $i>=0; $i--) {
             $trace = $traces[$i];
 
-            if ($trace['file'] === $current_file) {
+            if ($trace['file'] ?? null === $current_file) {
                 $selected_trace = $trace;
             }
         }
