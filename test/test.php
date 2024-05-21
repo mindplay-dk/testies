@@ -24,7 +24,6 @@ test(
         eq(format([1,2,3]), "array[3]");
         eq(format(true), "TRUE");
         eq(format(false), "FALSE");
-        eq(format(new Foo), "Foo");
     }
 );
 

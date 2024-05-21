@@ -76,18 +76,18 @@ ERROR
 
 
 Code Coverage Report:
-  2024-05-21 16:30:53
+  2024-05-21 17:04:44
 
  Summary:
   Classes:  0.00% (0/4)
   Methods: 20.59% (7/34)
-  Lines:   51.96% (186/358)
+  Lines:   52.22% (188/360)
 
 mindplay\testies\TestDriver
-  Methods:  35.29% ( 6/17)   Lines:  64.56% (102/158)
+  Methods:  35.29% ( 6/17)   Lines:  65.00% (104/160)
 mindplay\testies\readable
   Methods:  12.50% ( 1/ 8)   Lines:  50.00% ( 58/116)
 
 * code coverage report created: test/build/clover.xml
 
-* 1 tests completed: 26 assertions, 14 failures
+* 1 tests completed: 26 assertions, 15 failures

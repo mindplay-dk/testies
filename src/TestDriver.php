@@ -277,6 +277,8 @@ class TestDriver
 
     public function printError(Throwable $error)
     {
+        $this->failures += 1;
+        
         echo "ERROR\n" . $this->indent($this->formatError($error));
     }
 
