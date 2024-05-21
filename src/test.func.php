@@ -102,7 +102,7 @@ function teardown(Closure $function)
  */
 function ok(bool $result, ?string $why = null, $value = null)
 {
-    configure()->driver->printResult($result, $why, $value);
+    configure()->driver->printResult($result, $why, $result === false ? $value : null);
 }
 
 /**

@@ -28,23 +28,32 @@ test(
         ok(false, "why");
 
         ok(true, "why", "string");
+
+        ok(true, "why", "line 1\nline 2");
         ok(false, "why", "line 1\nline 2");
 
-        eq("string", "string"); // equal strings
+        // single-line strings:
+
+        eq("string", "string");
+        eq("string", "string", "why");
+        eq("string1", "string2", "why");
 
         // multi-line strings:
+
+        eq("string", "line 1\nline 2", "why");
+        eq("line 1\nline 2", "line 1\nline 2", "why");
 
         eq("line 1\nline 2\nline 3", "line 1\nline 2\nline 3"); // equal
         eq("line 1\nline 2\nline 3", "line 1\nline 3\nline 4"); // not equal
         eq("line 1\nline 2\nline 3", "line 1\nline 2!\nline 3"); // not equal
 
-        eq("foo", "foo", "why");
-        eq("foo", "bar", "why");
+        // comparing different types:
 
-        eq(format([1,2,3]), "array[3]");
-        eq(format(true), "TRUE");
-        eq(format(false), "FALSE");
-        eq(format(new Foo), "Foo");
+        eq(123, "123", "why");
+        eq("123", 123, "why");
+
+        eq(123, "line 1\nline 2", "why");
+        eq("line 1\nline 2", 123, "why");
 
         eq(invoke(new Foo, "blip"), "blip");
 

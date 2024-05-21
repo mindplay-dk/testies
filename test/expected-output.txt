@@ -5,78 +5,89 @@ PASS test/example.php(24):
 FAIL test/example.php(25):
 PASS test/example.php(27): why
 FAIL test/example.php(28): why
-PASS test/example.php(30): why (string)
-FAIL test/example.php(31): why
+PASS test/example.php(30): why
+PASS test/example.php(32): why
+FAIL test/example.php(33): why
   line 1
   line 2
-PASS test/example.php(33): (string)
-PASS test/example.php(37):
+PASS test/example.php(37): ("string")
+PASS test/example.php(38): why ("string")
+FAIL test/example.php(39): why ("string1" !== "string2")
+FAIL test/example.php(43): why
+[31m+ "string"
+[32m- line 1
+line 2
+[39m
+PASS test/example.php(44): why
+  line 1
+  line 2
+PASS test/example.php(46):
   line 1
   line 2
   line 3
-FAIL test/example.php(38):
+FAIL test/example.php(47):
 [39m  line 1
 [31m+ line 2
 [39m  line 3
 [32m- line 4
 [39m
-FAIL test/example.php(39):
+FAIL test/example.php(48):
 [39m  line 1
 [31m+ line 2
 [32m- line 2!
 [39m  line 3
 [39m
-PASS test/example.php(41): why (foo)
-FAIL test/example.php(42): why (foo !== bar)
-PASS test/example.php(44): (array[3])
-PASS test/example.php(45): (TRUE)
-PASS test/example.php(46): (FALSE)
-PASS test/example.php(47): (Foo)
-PASS test/example.php(49): (blip)
-PASS test/example.php(51): (blip)
-PASS test/example.php(53): why (RuntimeException: boom)
-PASS test/example.php(61): why (RuntimeException: booooooom)
-FAIL test/example.php(70): why (expected RuntimeException message did not match pattern: /bo+m/)
+FAIL test/example.php(52): why (123)
+FAIL test/example.php(53): why ("123")
+FAIL test/example.php(55): why (123)
+FAIL test/example.php(56): why
+  line 1
+  line 2
+PASS test/example.php(58): ("blip")
+PASS test/example.php(60): ("blip")
+PASS test/example.php(62): why
+PASS test/example.php(70): why
+FAIL test/example.php(79): why (expected RuntimeException message did not match pattern: /bo+m/)
   RuntimeException: bam
   
   Stacktrace:
     1. src/test.func.php:137 {closure}()
-    2. test/example.php:70 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(73)}, "/bo+m/")
+    2. test/example.php:79 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(82)}, "/bo+m/")
     3. src/TestDriver.php:155 {closure}()
     4. src/test.func.php:54 mindplay\testies\TestDriver->run()
-    5. test/example.php:100 mindplay\testies\run()
-FAIL test/example.php(79): why (expected RuntimeException but InvalidArgumentException was thrown)
+    5. test/example.php:109 mindplay\testies\run()
+FAIL test/example.php(88): why (expected RuntimeException but InvalidArgumentException was thrown)
   InvalidArgumentException: bam
   
   Stacktrace:
     1. src/test.func.php:137 {closure}()
-    2. test/example.php:79 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(82)}, "/bam/")
+    2. test/example.php:88 mindplay\testies\expect("RuntimeException", "why", {Closure in test/example.php(91)}, "/bam/")
     3. src/TestDriver.php:155 {closure}()
     4. src/test.func.php:54 mindplay\testies\TestDriver->run()
-    5. test/example.php:100 mindplay\testies\run()
-FAIL test/example.php(88): why (expected exception RuntimeException was NOT thrown)
+    5. test/example.php:109 mindplay\testies\run()
+FAIL test/example.php(97): why (expected exception RuntimeException was NOT thrown)
 ERROR
   RuntimeException: THE END
   
   Stacktrace:
     1. src/TestDriver.php:155 {closure}()
     2. src/test.func.php:54 mindplay\testies\TestDriver->run()
-    3. test/example.php:100 mindplay\testies\run()
+    3. test/example.php:109 mindplay\testies\run()
 
 
 Code Coverage Report:
-  2024-03-10 14:49:06
+  2024-05-21 16:30:53
 
  Summary:
   Classes:  0.00% (0/4)
-  Methods: 23.53% (8/34)
-  Lines:   48.73% (173/355)
+  Methods: 20.59% (7/34)
+  Lines:   51.96% (186/358)
 
 mindplay\testies\TestDriver
-  Methods:  41.18% ( 7/17)   Lines:  65.81% (102/155)
+  Methods:  35.29% ( 6/17)   Lines:  64.56% (102/158)
 mindplay\testies\readable
-  Methods:  12.50% ( 1/ 8)   Lines:  37.93% ( 44/116)
+  Methods:  12.50% ( 1/ 8)   Lines:  50.00% ( 58/116)
 
 * code coverage report created: test/build/clover.xml
 
-* 1 tests completed: 23 assertions, 9 failures
+* 1 tests completed: 26 assertions, 14 failures

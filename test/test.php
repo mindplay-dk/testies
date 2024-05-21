@@ -4,7 +4,7 @@ use mindplay\testies\TestServer;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Zaphyr\HttpClient\Client;
 
-use function mindplay\testies\{configure, eq, ok, run, test};
+use function mindplay\testies\{configure, eq, ok, format, run, test};
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
 
@@ -17,6 +17,16 @@ function clean_report(string $str): string
     $str = preg_replace('/\s+$/m', '', $str);                                        // clean trailing white space
     return $str;
 }
+
+test(
+    "can format values",
+    function () {
+        eq(format([1,2,3]), "array[3]");
+        eq(format(true), "TRUE");
+        eq(format(false), "FALSE");
+        eq(format(new Foo), "Foo");
+    }
+);
 
 test(
     "Check test result",

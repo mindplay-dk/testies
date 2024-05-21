@@ -241,7 +241,11 @@ class TestDriver
 
         $formatted_value = $this->format($value, $detailed);
 
-        $show_diff = $value !== $expected && func_num_args() === 4;
+        $result_type = readable::typeof($value);
+        $expected_type = readable::typeof($expected);
+        $same_types = $result_type === $expected_type;
+
+        $show_diff = $value !== $expected && func_num_args() === 4 && $same_types;
 
         if ($show_diff) {
             $formatted_expected = $this->format($expected, $detailed);
@@ -314,8 +318,9 @@ class TestDriver
 
         if (is_string($value)) {
             $lines = explode("\n", $value);
-            $lines = array_map([$this, "escape"], $lines);
-            $value = implode("\n", $lines);
+            return count($lines) === 1
+                ? readable::value($value)
+                : implode("\n", array_map([$this, "escape"], $lines));
         }
 
         return print_r($value, true);
